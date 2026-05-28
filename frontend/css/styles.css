@@ -1,0 +1,67 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.container {
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #1e293b;
+  border-radius: 8px;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.seat {
+  width: 48px;
+  height: 32px;
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px solid #334155;
+  text-align: center;
+  line-height: 32px;
+  cursor: pointer;
+  background: #16a34a;
+}
+
+.seat.booked {
+  background: #dc2626;
+  cursor: not-allowed;
+}
+
+.seat.selected {
+  background: #f59e0b;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  border: 1px solid #334155;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background: #334155;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}

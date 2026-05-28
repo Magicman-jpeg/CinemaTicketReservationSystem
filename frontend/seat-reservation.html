@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinema Seat Reservation</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Cinema Seat Reservation</h1>
+    <p>Rows A-K, Columns 1-10</p>
+    <div id="seat-grid" class="seat-grid"></div>
+    <div class="legend">
+      <span class="seat available"></span> Available
+      <span class="seat booked"></span> Booked
+      <span class="seat selected"></span> Selected
+    </div>
+    <button id="reserveBtn">Reserve Selected Seat</button>
+    <p id="status"></p>
+  </div>
+  <script src="js/seat.js"></script>
+</body>
+</html>
