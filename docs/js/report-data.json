@@ -1,0 +1,97 @@
+{
+  "ticketsPerMovie": [
+    {
+      "movie": "Michael",
+      "tickets": 73
+    },
+    {
+      "movie": "Fractured",
+      "tickets": 52
+    },
+    {
+      "movie": "Lucy",
+      "tickets": 34
+    },
+    {
+      "movie": "Wicked Part 1",
+      "tickets": 31
+    },
+    {
+      "movie": "Journey 2: Mysterious Island",
+      "tickets": 29
+    },
+    {
+      "movie": "The Sheep Detectives",
+      "tickets": 16
+    },
+    {
+      "movie": "John Wick 1",
+      "tickets": 16
+    },
+    {
+      "movie": "Me Before You",
+      "tickets": 15
+    },
+    {
+      "movie": "Insidious",
+      "tickets": 15
+    },
+    {
+      "movie": "Hunger Games 2: Catching Fire",
+      "tickets": 15
+    }
+  ],
+  "dailyRevenue": [
+    {
+      "date": "2026-06-04 00:00:00",
+      "revenue": 16950.0
+    },
+    {
+      "date": "2026-06-05 00:00:00",
+      "revenue": 20766.0
+    },
+    {
+      "date": "2026-06-06 00:00:00",
+      "revenue": 29027.0
+    },
+    {
+      "date": "2026-06-07 00:00:00",
+      "revenue": 25811.0
+    },
+    {
+      "date": "2026-06-08 00:00:00",
+      "revenue": 19204.0
+    },
+    {
+      "date": "2026-06-09 00:00:00",
+      "revenue": 11121.0
+    }
+  ],
+  "weeklyRevenue": [
+    {
+      "week": "2026-W22",
+      "revenue": 92554.0
+    },
+    {
+      "week": "2026-W23",
+      "revenue": 30325.0
+    }
+  ],
+  "discountUsage": [
+    {
+      "discountType": "N/A",
+      "count": 287,
+      "totalDiscount": 0.0
+    },
+    {
+      "discountType": "PWD",
+      "count": 6,
+      "totalDiscount": 416.0
+    },
+    {
+      "discountType": "Senior Citizen",
+      "count": 3,
+      "totalDiscount": 240.0
+    }
+  ]
+}
