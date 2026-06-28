@@ -1,104 +1,73 @@
 package com.cinema.model;
 
 /**
- * Represents a Screening (showtime) entity.
- * Links a Movie to a specific date, time, and cinema hall.
+ * Represents a Screening (from screenings table in Excel).
+ * Fields: screening_id (TEXT), screening_day, screening_date, time_slot, seat_type_id, movie_id, cinema_no
  */
 public class Screening {
 
-    private int screeningId;
+    private String screeningId;     // e.g. "SUN-1", "MON-5", "TUE-12"
+    private String screeningDay;    // SUN, MON, TUE
+    private String screeningDate;   // YYYY-MM-DD
+    private String timeSlot;        // HH:MM
+    private int seatTypeId;
     private int movieId;
-    private String screenDate;
-    private String screenTime;
-    private int hallNumber;
+    private int cinemaNo;
+
+    // Resolved values
+    private String movieTitle;
+    private String seatTypeName;
     private double ticketPrice;
 
-    // Default constructor
-    public Screening() {
-    }
+    public Screening() {}
 
-    // Parameterized constructor
-    public Screening(int screeningId, int movieId, String screenDate,
-                     String screenTime, int hallNumber, double ticketPrice) {
+    public Screening(String screeningId, String screeningDay, String screeningDate,
+                     String timeSlot, int seatTypeId, int movieId, int cinemaNo) {
         this.screeningId = screeningId;
+        this.screeningDay = screeningDay;
+        this.screeningDate = screeningDate;
+        this.timeSlot = timeSlot;
+        this.seatTypeId = seatTypeId;
         this.movieId = movieId;
-        this.screenDate = screenDate;
-        this.screenTime = screenTime;
-        this.hallNumber = hallNumber;
-        this.ticketPrice = ticketPrice;
+        this.cinemaNo = cinemaNo;
     }
 
-    // Constructor without ID (for new inserts)
-    public Screening(int movieId, String screenDate, String screenTime,
-                     int hallNumber, double ticketPrice) {
-        this.movieId = movieId;
-        this.screenDate = screenDate;
-        this.screenTime = screenTime;
-        this.hallNumber = hallNumber;
-        this.ticketPrice = ticketPrice;
-    }
-
-    // Getters and Setters
-    public int getScreeningId() {
-        return screeningId;
-    }
-
-    public void setScreeningId(int screeningId) {
-        this.screeningId = screeningId;
-    }
-
-    public int getMovieId() {
-        return movieId;
-    }
-
-    public void setMovieId(int movieId) {
-        this.movieId = movieId;
-    }
-
-    public String getScreenDate() {
-        return screenDate;
-    }
-
-    public void setScreenDate(String screenDate) {
-        this.screenDate = screenDate;
-    }
-
-    public String getScreenTime() {
-        return screenTime;
-    }
-
-    public void setScreenTime(String screenTime) {
-        this.screenTime = screenTime;
-    }
-
-    public int getHallNumber() {
-        return hallNumber;
-    }
-
-    public void setHallNumber(int hallNumber) {
-        this.hallNumber = hallNumber;
-    }
-
-    public double getTicketPrice() {
-        return ticketPrice;
-    }
-
-    public void setTicketPrice(double ticketPrice) {
-        this.ticketPrice = ticketPrice;
-    }
+    public String getScreeningId() { return screeningId; }
+    public void setScreeningId(String screeningId) { this.screeningId = screeningId; }
+    public String getScreeningDay() { return screeningDay; }
+    public void setScreeningDay(String screeningDay) { this.screeningDay = screeningDay; }
+    public String getScreeningDate() { return screeningDate; }
+    public void setScreeningDate(String screeningDate) { this.screeningDate = screeningDate; }
+    public String getTimeSlot() { return timeSlot; }
+    public void setTimeSlot(String timeSlot) { this.timeSlot = timeSlot; }
+    public int getSeatTypeId() { return seatTypeId; }
+    public void setSeatTypeId(int seatTypeId) { this.seatTypeId = seatTypeId; }
+    public int getMovieId() { return movieId; }
+    public void setMovieId(int movieId) { this.movieId = movieId; }
+    public int getCinemaNo() { return cinemaNo; }
+    public void setCinemaNo(int cinemaNo) { this.cinemaNo = cinemaNo; }
+    public String getMovieTitle() { return movieTitle; }
+    public void setMovieTitle(String movieTitle) { this.movieTitle = movieTitle; }
+    public String getSeatTypeName() { return seatTypeName; }
+    public void setSeatTypeName(String seatTypeName) { this.seatTypeName = seatTypeName; }
+    public double getTicketPrice() { return ticketPrice; }
+    public void setTicketPrice(double ticketPrice) { this.ticketPrice = ticketPrice; }
 
     @Override
     public String toString() {
-        return String.format("| %-4d | %-8d | %-10s | %-8s | Hall %-2d | PHP %.2f |",
-                screeningId, movieId, screenDate, screenTime, hallNumber, ticketPrice);
+        return String.format("| %-7s | %-3s | %-10s | %-5s | Cinema %-2d | %-8s | PHP %6.2f | %-30s |",
+                screeningId, screeningDay, screeningDate, timeSlot, cinemaNo,
+                seatTypeName != null ? seatTypeName : "Type" + seatTypeId,
+                ticketPrice,
+                movieTitle != null ? movieTitle : "Movie" + movieId);
     }
 
     public static String getTableHeader() {
-        return String.format("| %-4s | %-8s | %-10s | %-8s | %-7s | %-10s |",
-                "ID", "MovieID", "Date", "Time", "Hall", "Price");
+        return String.format("| %-7s | %-3s | %-10s | %-5s | %-9s | %-8s | %-10s | %-30s |",
+                "ID", "Day", "Date", "Time", "Cinema", "SeatType", "Price", "Movie");
     }
 
     public static String getTableDivider() {
-        return "+------+----------+------------+----------+---------+------------+";
+        return "+---------+-----+------------+-------+-----------+----------+------------+--------------------------------+";
     }
 }

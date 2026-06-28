@@ -8,10 +8,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Service class for handling seat reservations and ticket booking.
- * Contains business logic for the reservation workflow.
+ * Service class for seat reservations.
  */
 public class ReservationService {
 
@@ -26,183 +26,117 @@ public class ReservationService {
     }
 
     /**
-     * Reserves a seat for a customer at a specific screening.
-     * Validates seat availability and creates the transaction.
+     * Reserves a seat for a customer.
      */
-    public Transaction reserveSeat(int customerId, int screeningId,
-                                   String seatRow, int seatColumn,
-                                   String paymentMethod, double discount)
+    public Transaction reserveSeat(int customerNo, String screeningId,
+                                   String seatNo, String reservationType,
+                                   String paymentMethod, String discountType,
+                                   String adminId)
             throws InvalidSeatException, DuplicateReservationException,
                    PaymentFailedException, DatabaseConnectionException {
 
-        // Validate row and column
-        validateSeatPosition(seatRow, seatColumn);
-
-        // Find the seat
-        CinemaSeat seat = seatDAO.findByPosition(screeningId, seatRow, seatColumn);
+        // Validate seat exists
+        CinemaSeat seat = seatDAO.findBySeatNo(seatNo);
         if (seat == null) {
-            throw new InvalidSeatException(
-                "Seat " + seatRow + seatColumn + " does not exist for this screening.",
-                seatRow + seatColumn);
+            throw new InvalidSeatException("Seat " + seatNo + " does not exist.", seatNo);
         }
 
-        // Check availability
-        if (!seat.isAvailable()) {
+        // Check if already booked
+        if (transactionDAO.isSeatBooked(screeningId, seatNo)) {
             throw new DuplicateReservationException(
-                "Seat " + seat.getSeatLabel() + " is already reserved.",
-                customerId, screeningId, seat.getSeatLabel());
+                "Seat " + seatNo + " is already booked for this screening.",
+                customerNo, 0, seatNo);
         }
 
 
-        // Get screening for price calculation
+        // Get screening for price
         Screening screening = screeningDAO.findById(screeningId);
         if (screening == null) {
-            throw new InvalidSeatException("Screening not found.", seatRow + seatColumn);
+            throw new InvalidSeatException("Screening not found.", seatNo);
         }
 
-        // Calculate amount with discount
-        double basePrice = screening.getTicketPrice();
-        double finalAmount = basePrice * (1.0 - discount);
+        double ticketPrice = screening.getTicketPrice();
+        double bookingFee = "Online".equalsIgnoreCase(reservationType) ? 20.00 : 0.00;
+        double discountAmount = 0.0;
 
-        // Validate payment
-        if (finalAmount < 0) {
-            throw new PaymentFailedException(
-                "Invalid payment amount calculated.",
-                paymentMethod, finalAmount);
+        // Calculate discount
+        if ("Senior Citizen".equalsIgnoreCase(discountType)) {
+            discountAmount = ticketPrice * 0.20;
+        } else if ("PWD".equalsIgnoreCase(discountType)) {
+            discountAmount = ticketPrice * 0.20;
         }
 
-        // Create transaction
+        double totalPayment = ticketPrice + bookingFee - discountAmount;
+
+        // Generate transaction ID: seatTypeId-M{movieId}-customerNo
+        String txnId = String.format("%d-M%02d-%d",
+                screening.getSeatTypeId(), screening.getMovieId(), customerNo);
+
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String now = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String now = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 
         Transaction txn = new Transaction();
-        txn.setCustomerId(customerId);
-        txn.setScreeningId(screeningId);
-        txn.setSeatId(seat.getSeatId());
-        txn.setSeatLabel(seat.getSeatLabel());
+        txn.setTransactionId(txnId);
         txn.setTransactionDate(today);
         txn.setTransactionTime(now);
-        txn.setAmountPaid(finalAmount);
+        txn.setCustomerNo(customerNo);
+        txn.setSeatNo(seatNo);
+        txn.setScreeningId(screeningId);
+        txn.setMovieId(screening.getMovieId());
+        txn.setSeatTypeId(screening.getSeatTypeId());
+        txn.setReservationType(reservationType);
+        txn.setAdminId(adminId);
+        txn.setBookingFee(bookingFee);
+        txn.setTicketPrice(ticketPrice);
+        txn.setDiscountType(discountType != null ? discountType : "N/A");
+        txn.setDiscountAmount(discountAmount);
         txn.setPaymentMethod(paymentMethod);
+        txn.setTotalPayment(totalPayment);
         txn.setStatus(Transaction.STATUS_CONFIRMED);
 
-        // Reserve the seat
-        seatDAO.reserveSeat(seat.getSeatId());
-
-        // Save transaction
-        int txnId = transactionDAO.insert(txn);
-        txn.setTransactionId(txnId);
-
+        transactionDAO.insert(txn);
         return txn;
     }
 
-    /**
-     * Cancels a reservation and releases the seat.
-     */
-    public boolean cancelReservation(int transactionId, int customerId)
+    public boolean cancelReservation(String transactionId, int customerNo)
             throws DatabaseConnectionException {
         Transaction txn = transactionDAO.findById(transactionId);
-        if (txn == null || txn.getCustomerId() != customerId) {
-            return false;
-        }
-        if (!txn.isConfirmed()) {
-            return false; // Already cancelled
-        }
-
-        // Release seat
-        seatDAO.releaseSeat(txn.getSeatId());
-        // Cancel transaction
+        if (txn == null || txn.getCustomerNo() != customerNo) return false;
+        if (!txn.isConfirmed()) return false;
         transactionDAO.cancel(transactionId);
         return true;
     }
 
-
-    /**
-     * Gets all reservations for a customer.
-     */
-    public List<Transaction> getCustomerReservations(int customerId)
+    public List<Transaction> getCustomerReservations(int customerNo)
             throws DatabaseConnectionException {
-        return transactionDAO.findByCustomerId(customerId);
+        return transactionDAO.findByCustomerNo(customerNo);
     }
 
     /**
-     * Gets available seats for a screening.
+     * Generates ASCII seat map for a screening.
      */
-    public List<CinemaSeat> getAvailableSeats(int screeningId)
-            throws DatabaseConnectionException {
-        return seatDAO.findAvailableByScreeningId(screeningId);
-    }
+    public String generateSeatMap(String screeningId) throws DatabaseConnectionException {
+        Set<String> booked = seatDAO.getBookedSeats(screeningId);
 
-    /**
-     * Gets all seats for a screening (for seat map display).
-     */
-    public List<CinemaSeat> getAllSeats(int screeningId)
-            throws DatabaseConnectionException {
-        return seatDAO.findByScreeningId(screeningId);
-    }
-
-    /**
-     * Validates seat row and column are within valid range.
-     */
-    private void validateSeatPosition(String row, int column) throws InvalidSeatException {
-        // Valid rows: A-K
-        if (row == null || row.length() != 1 || row.charAt(0) < 'A' || row.charAt(0) > 'K') {
-            throw new InvalidSeatException(
-                "Invalid row '" + row + "'. Must be A through K.", row + column);
-        }
-        // Valid columns: 1-10
-        if (column < 1 || column > 10) {
-            throw new InvalidSeatException(
-                "Invalid column '" + column + "'. Must be 1 through 10.", row + column);
-        }
-    }
-
-    /**
-     * Generates the ASCII seat map for a screening.
-     */
-    public String generateSeatMap(int screeningId) throws DatabaseConnectionException {
-        List<CinemaSeat> seats = seatDAO.findByScreeningId(screeningId);
-        if (seats.isEmpty()) {
-            return "No seats found for this screening.";
-        }
-
-        // Build seat grid
         StringBuilder sb = new StringBuilder();
         sb.append("\n              ========== SCREEN ==========\n\n");
         sb.append("        1    2    3    4    5    6    7    8    9   10\n");
         sb.append("      +----+----+----+----+----+----+----+----+----+----+\n");
 
-        String[] rows = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
+        String[] rows = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
         for (String row : rows) {
             sb.append("  ").append(row).append("   |");
             for (int col = 1; col <= 10; col++) {
-                String status = getSeatStatus(seats, row, col);
-                switch (status) {
-                    case CinemaSeat.STATUS_AVAILABLE:
-                        sb.append(" -- |"); // Available
-                        break;
-                    case CinemaSeat.STATUS_RESERVED:
-                        sb.append(" XX |"); // Reserved
-                        break;
-                    case CinemaSeat.STATUS_OCCUPIED:
-                        sb.append(" ## |"); // Occupied
-                        break;
-                    default:
-                        sb.append(" ?? |"); // Unknown
+                String seatNo = row + col;
+                if (booked.contains(seatNo)) {
+                    sb.append(" XX |");
+                } else {
+                    sb.append(" -- |");
                 }
             }
             sb.append("\n      +----+----+----+----+----+----+----+----+----+----+\n");
         }
-        sb.append("\n  Legend: [ -- ] Available   [ XX ] Reserved   [ ## ] Occupied\n");
+        sb.append("\n  Legend: [ -- ] Available   [ XX ] Reserved\n");
         return sb.toString();
-    }
-
-    private String getSeatStatus(List<CinemaSeat> seats, String row, int col) {
-        for (CinemaSeat seat : seats) {
-            if (row.equals(seat.getSeatRow()) && col == seat.getSeatColumn()) {
-                return seat.getStatus();
-            }
-        }
-        return "UNKNOWN";
     }
 }

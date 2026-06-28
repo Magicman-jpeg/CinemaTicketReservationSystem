@@ -2,149 +2,129 @@ package com.cinema.dao;
 
 import com.cinema.exception.DatabaseConnectionException;
 import com.cinema.model.Movie;
-
 import java.util.*;
 
 /**
- * Data Access Object for Movie entity.
- * Provides CRUD operations for the movie table.
+ * Data Access Object for Movie entity (with genre, status, age_rating lookups).
  */
 public class MovieDAO {
 
     private final DatabaseManager db;
 
-    public MovieDAO() {
-        this.db = DatabaseManager.getInstance();
+    public MovieDAO() { this.db = DatabaseManager.getInstance(); }
+
+    public List<Movie> findAll() throws DatabaseConnectionException {
+        String sql = "SELECT m.*, g.movie_genre, s.movie_status, a.movie_age_rating " +
+                     "FROM movie m " +
+                     "LEFT JOIN movie_genre g ON m.genre_id = g.genre_id " +
+                     "LEFT JOIN movie_status s ON m.status_id = s.status_id " +
+                     "LEFT JOIN age_rating a ON m.age_rate_id = a.age_rate_id " +
+                     "ORDER BY m.movie_id";
+        List<Map<String, String>> results = db.executeQuery(sql);
+        List<Movie> movies = new ArrayList<>();
+        for (Map<String, String> row : results) movies.add(mapToMovie(row));
+        return movies;
     }
 
-    /**
-     * Inserts a new movie into the database.
-     * @return the auto-generated movie ID
-     */
-    public int insert(Movie movie) throws DatabaseConnectionException {
-        String sql = String.format(
-            "INSERT INTO movie (title, genre, duration_minutes, rating, director, release_date) " +
-            "VALUES ('%s', '%s', %d, '%s', '%s', '%s')",
-            DatabaseManager.escapeString(movie.getTitle()),
-            DatabaseManager.escapeString(movie.getGenre()),
-            movie.getDurationMinutes(),
-            DatabaseManager.escapeString(movie.getRating()),
-            DatabaseManager.escapeString(movie.getDirector()),
-            DatabaseManager.escapeString(movie.getReleaseDate())
-        );
-        return db.executeInsert(sql);
-    }
-
-    /**
-     * Retrieves a movie by its ID.
-     */
     public Movie findById(int movieId) throws DatabaseConnectionException {
-        String sql = String.format("SELECT * FROM movie WHERE movie_id = %d", movieId);
+        String sql = String.format(
+            "SELECT m.*, g.movie_genre, s.movie_status, a.movie_age_rating " +
+            "FROM movie m " +
+            "LEFT JOIN movie_genre g ON m.genre_id = g.genre_id " +
+            "LEFT JOIN movie_status s ON m.status_id = s.status_id " +
+            "LEFT JOIN age_rating a ON m.age_rate_id = a.age_rate_id " +
+            "WHERE m.movie_id = %d", movieId);
         List<Map<String, String>> results = db.executeQuery(sql);
         if (results.isEmpty()) return null;
         return mapToMovie(results.get(0));
     }
 
-    /**
-     * Retrieves all movies from the database.
-     */
-    public List<Movie> findAll() throws DatabaseConnectionException {
-        String sql = "SELECT * FROM movie ORDER BY movie_id";
-        List<Map<String, String>> results = db.executeQuery(sql);
-        List<Movie> movies = new ArrayList<>();
-        for (Map<String, String> row : results) {
-            movies.add(mapToMovie(row));
-        }
-        return movies;
-    }
-
-    /**
-     * Searches movies by title (partial match).
-     */
     public List<Movie> searchByTitle(String keyword) throws DatabaseConnectionException {
         String sql = String.format(
-            "SELECT * FROM movie WHERE title LIKE '%%%s%%' ORDER BY title",
-            DatabaseManager.escapeString(keyword)
-        );
+            "SELECT m.*, g.movie_genre, s.movie_status, a.movie_age_rating " +
+            "FROM movie m " +
+            "LEFT JOIN movie_genre g ON m.genre_id = g.genre_id " +
+            "LEFT JOIN movie_status s ON m.status_id = s.status_id " +
+            "LEFT JOIN age_rating a ON m.age_rate_id = a.age_rate_id " +
+            "WHERE m.movie_title LIKE '%%%s%%' ORDER BY m.movie_title",
+            DatabaseManager.escapeString(keyword));
         List<Map<String, String>> results = db.executeQuery(sql);
         List<Movie> movies = new ArrayList<>();
-        for (Map<String, String> row : results) {
-            movies.add(mapToMovie(row));
-        }
+        for (Map<String, String> row : results) movies.add(mapToMovie(row));
         return movies;
     }
 
-    /**
-     * Searches movies by genre.
-     */
-    public List<Movie> searchByGenre(String genre) throws DatabaseConnectionException {
+    public List<Movie> findByStatus(String status) throws DatabaseConnectionException {
         String sql = String.format(
-            "SELECT * FROM movie WHERE genre LIKE '%%%s%%' ORDER BY title",
-            DatabaseManager.escapeString(genre)
-        );
+            "SELECT m.*, g.movie_genre, s.movie_status, a.movie_age_rating " +
+            "FROM movie m " +
+            "LEFT JOIN movie_genre g ON m.genre_id = g.genre_id " +
+            "LEFT JOIN movie_status s ON m.status_id = s.status_id " +
+            "LEFT JOIN age_rating a ON m.age_rate_id = a.age_rate_id " +
+            "WHERE s.movie_status = '%s' ORDER BY m.movie_title",
+            DatabaseManager.escapeString(status));
         List<Map<String, String>> results = db.executeQuery(sql);
         List<Movie> movies = new ArrayList<>();
-        for (Map<String, String> row : results) {
-            movies.add(mapToMovie(row));
-        }
+        for (Map<String, String> row : results) movies.add(mapToMovie(row));
         return movies;
     }
 
-    /**
-     * Updates an existing movie record.
-     */
+    public int insert(Movie movie) throws DatabaseConnectionException {
+        String sql = String.format(
+            "INSERT INTO movie (movie_title, genre_id, movie_duration, duration_code, release_date, status_id, age_rate_id) " +
+            "VALUES ('%s', %d, '%s', %d, '%s', %d, %d)",
+            DatabaseManager.escapeString(movie.getMovieTitle()), movie.getGenreId(),
+            DatabaseManager.escapeString(movie.getMovieDuration()), movie.getDurationCode(),
+            DatabaseManager.escapeString(movie.getReleaseDate()), movie.getStatusId(), movie.getAgeRateId());
+        return db.executeInsert(sql);
+    }
+
     public boolean update(Movie movie) throws DatabaseConnectionException {
         String sql = String.format(
-            "UPDATE movie SET title='%s', genre='%s', duration_minutes=%d, " +
-            "rating='%s', director='%s', release_date='%s' WHERE movie_id=%d",
-            DatabaseManager.escapeString(movie.getTitle()),
-            DatabaseManager.escapeString(movie.getGenre()),
-            movie.getDurationMinutes(),
-            DatabaseManager.escapeString(movie.getRating()),
-            DatabaseManager.escapeString(movie.getDirector()),
-            DatabaseManager.escapeString(movie.getReleaseDate()),
-            movie.getMovieId()
-        );
+            "UPDATE movie SET movie_title='%s', genre_id=%d, movie_duration='%s', " +
+            "duration_code=%d, release_date='%s', status_id=%d, age_rate_id=%d WHERE movie_id=%d",
+            DatabaseManager.escapeString(movie.getMovieTitle()), movie.getGenreId(),
+            DatabaseManager.escapeString(movie.getMovieDuration()), movie.getDurationCode(),
+            DatabaseManager.escapeString(movie.getReleaseDate()), movie.getStatusId(),
+            movie.getAgeRateId(), movie.getMovieId());
         db.executeUpdate(sql);
         return true;
     }
 
-    /**
-     * Deletes a movie by ID.
-     */
     public boolean delete(int movieId) throws DatabaseConnectionException {
-        String sql = String.format("DELETE FROM movie WHERE movie_id = %d", movieId);
-        db.executeUpdate(sql);
+        db.executeUpdate(String.format("DELETE FROM movie WHERE movie_id = %d", movieId));
         return true;
     }
 
-    /**
-     * Gets the total count of movies.
-     */
-    public int getCount() throws DatabaseConnectionException {
-        return db.getRowCount("movie");
+    public int getCount() throws DatabaseConnectionException { return db.getRowCount("movie"); }
+
+    public List<Map<String, String>> getGenres() throws DatabaseConnectionException {
+        return db.executeQuery("SELECT * FROM movie_genre ORDER BY genre_id");
     }
 
-    /**
-     * Maps a database row to a Movie object.
-     */
+    public List<Map<String, String>> getStatuses() throws DatabaseConnectionException {
+        return db.executeQuery("SELECT * FROM movie_status ORDER BY status_id");
+    }
+
+    public List<Map<String, String>> getAgeRatings() throws DatabaseConnectionException {
+        return db.executeQuery("SELECT * FROM age_rating ORDER BY age_rate_id");
+    }
+
     private Movie mapToMovie(Map<String, String> row) {
-        Movie movie = new Movie();
-        movie.setMovieId(parseIntSafe(row.get("movie_id")));
-        movie.setTitle(row.get("title"));
-        movie.setGenre(row.get("genre"));
-        movie.setDurationMinutes(parseIntSafe(row.get("duration_minutes")));
-        movie.setRating(row.get("rating"));
-        movie.setDirector(row.get("director"));
-        movie.setReleaseDate(row.get("release_date"));
-        return movie;
+        Movie m = new Movie();
+        m.setMovieId(parseInt(row.get("movie_id")));
+        m.setMovieTitle(row.get("movie_title"));
+        m.setGenreId(parseInt(row.get("genre_id")));
+        m.setMovieDuration(row.get("movie_duration"));
+        m.setDurationCode(parseInt(row.get("duration_code")));
+        m.setReleaseDate(row.get("release_date"));
+        m.setStatusId(parseInt(row.get("status_id")));
+        m.setAgeRateId(parseInt(row.get("age_rate_id")));
+        m.setGenreName(row.get("movie_genre"));
+        m.setStatusName(row.get("movie_status"));
+        m.setAgeRating(row.get("movie_age_rating"));
+        return m;
     }
 
-    private int parseIntSafe(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
+    private int parseInt(String v) { try { return Integer.parseInt(v); } catch (Exception e) { return 0; } }
 }

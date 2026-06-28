@@ -1,127 +1,44 @@
 package com.cinema.model;
 
 /**
- * Represents a seat in the cinema hall.
- * Rows are labeled A-K, columns 1-10 (110 seats per hall).
- * Demonstrates encapsulation and status tracking for reservations.
+ * Represents a Cinema Seat (from cinema_seat table in Excel).
+ * Fields: seat_no (TEXT, e.g. "A1"), row (TEXT), col (INTEGER)
+ * Seat availability is tracked per screening in the transaction table.
  */
 public class CinemaSeat {
 
-    private int seatId;
-    private int screeningId;
-    private String seatRow;    // A through K
-    private int seatColumn;    // 1 through 10
-    private String status;     // AVAILABLE, RESERVED, OCCUPIED
+    private String seatNo;  // e.g. "A1", "J10"
+    private String row;     // A through J
+    private int col;        // 1 through 10
 
-    // Constants for seat status
     public static final String STATUS_AVAILABLE = "AVAILABLE";
     public static final String STATUS_RESERVED = "RESERVED";
-    public static final String STATUS_OCCUPIED = "OCCUPIED";
 
-    // Default constructor
-    public CinemaSeat() {
-        this.status = STATUS_AVAILABLE;
+    public CinemaSeat() {}
+
+    public CinemaSeat(String seatNo, String row, int col) {
+        this.seatNo = seatNo;
+        this.row = row;
+        this.col = col;
     }
 
-    // Parameterized constructor
-    public CinemaSeat(int seatId, int screeningId, String seatRow,
-                      int seatColumn, String status) {
-        this.seatId = seatId;
-        this.screeningId = screeningId;
-        this.seatRow = seatRow;
-        this.seatColumn = seatColumn;
-        this.status = status;
-    }
-
-    // Constructor without ID
-    public CinemaSeat(int screeningId, String seatRow, int seatColumn, String status) {
-        this.screeningId = screeningId;
-        this.seatRow = seatRow;
-        this.seatColumn = seatColumn;
-        this.status = status;
-    }
-
-    // Getters and Setters
-    public int getSeatId() {
-        return seatId;
-    }
-
-    public void setSeatId(int seatId) {
-        this.seatId = seatId;
-    }
-
-    public int getScreeningId() {
-        return screeningId;
-    }
-
-    public void setScreeningId(int screeningId) {
-        this.screeningId = screeningId;
-    }
-
-    public String getSeatRow() {
-        return seatRow;
-    }
-
-    public void setSeatRow(String seatRow) {
-        this.seatRow = seatRow;
-    }
-
-    public int getSeatColumn() {
-        return seatColumn;
-    }
-
-    public void setSeatColumn(int seatColumn) {
-        this.seatColumn = seatColumn;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    /**
-     * Returns the seat label (e.g., "A5", "K10").
-     */
-    public String getSeatLabel() {
-        return seatRow + seatColumn;
-    }
-
-    /**
-     * Checks if the seat is available for reservation.
-     */
-    public boolean isAvailable() {
-        return STATUS_AVAILABLE.equals(this.status);
-    }
-
-    /**
-     * Reserves the seat (changes status to RESERVED).
-     */
-    public void reserve() {
-        this.status = STATUS_RESERVED;
-    }
-
-    /**
-     * Releases the seat (changes status back to AVAILABLE).
-     */
-    public void release() {
-        this.status = STATUS_AVAILABLE;
-    }
+    public String getSeatNo() { return seatNo; }
+    public void setSeatNo(String seatNo) { this.seatNo = seatNo; }
+    public String getRow() { return row; }
+    public void setRow(String row) { this.row = row; }
+    public int getCol() { return col; }
+    public void setCol(int col) { this.col = col; }
 
     @Override
     public String toString() {
-        return String.format("| %-6d | %-11d | %-4s | %-6d | %-9s |",
-                seatId, screeningId, seatRow, seatColumn, status);
+        return String.format("| %-6s | %-3s | %-3d |", seatNo, row, col);
     }
 
     public static String getTableHeader() {
-        return String.format("| %-6s | %-11s | %-4s | %-6s | %-9s |",
-                "SeatID", "ScreeningID", "Row", "Col", "Status");
+        return String.format("| %-6s | %-3s | %-3s |", "Seat", "Row", "Col");
     }
 
     public static String getTableDivider() {
-        return "+--------+-------------+------+--------+-----------+";
+        return "+--------+-----+-----+";
     }
 }

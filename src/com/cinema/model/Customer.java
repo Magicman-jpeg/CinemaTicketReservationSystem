@@ -1,119 +1,87 @@
 package com.cinema.model;
 
 /**
- * Represents a Customer user in the system.
- * Inherits from User (demonstrates inheritance).
- * Customers can browse movies, reserve seats, and view their bookings.
+ * Represents a Customer (from customer table in Excel).
+ * Fields: customer_no, name, age, email_address, app_user, customer_username, customer_pass, mobile_no
  */
 public class Customer extends User {
 
-    private String phoneNumber;
-    private String membershipType; // REGULAR, PREMIUM, VIP
-    private String registrationDate;
+    private int customerNo;
+    private String name;
+    private int age;
+    private String emailAddress;
+    private String appUser;       // "Yes" or "No"
+    private String mobileNo;
 
-    public static final String ROLE = "CUSTOMER";
+    public Customer() { super(); setRole("CUSTOMER"); }
 
-    // Default constructor
-    public Customer() {
-        super();
-        setRole(ROLE);
+    public Customer(int customerNo, String name, int age, String emailAddress,
+                    String appUser, String username, String password, String mobileNo) {
+        super(username, password, "CUSTOMER");
+        this.customerNo = customerNo;
+        this.name = name;
+        this.age = age;
+        this.emailAddress = emailAddress;
+        this.appUser = appUser;
+        this.mobileNo = mobileNo;
     }
 
-    // Parameterized constructor
-    public Customer(int userId, String username, String password,
-                    String fullName, String email, String phoneNumber,
-                    String membershipType, String registrationDate) {
-        super(userId, username, password, fullName, email, ROLE);
-        this.phoneNumber = phoneNumber;
-        this.membershipType = membershipType;
-        this.registrationDate = registrationDate;
-    }
+    public int getCustomerNo() { return customerNo; }
+    public void setCustomerNo(int customerNo) { this.customerNo = customerNo; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+    public String getEmailAddress() { return emailAddress; }
+    public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
+    public String getAppUser() { return appUser; }
+    public void setAppUser(String appUser) { this.appUser = appUser; }
+    public String getMobileNo() { return mobileNo; }
+    public void setMobileNo(String mobileNo) { this.mobileNo = mobileNo; }
 
-    // Constructor without ID
-    public Customer(String username, String password, String fullName,
-                    String email, String phoneNumber, String membershipType,
-                    String registrationDate) {
-        super(username, password, fullName, email, ROLE);
-        this.phoneNumber = phoneNumber;
-        this.membershipType = membershipType;
-        this.registrationDate = registrationDate;
-    }
-
-    // Getters and Setters
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getMembershipType() {
-        return membershipType;
-    }
-
-    public void setMembershipType(String membershipType) {
-        this.membershipType = membershipType;
-    }
-
-    public String getRegistrationDate() {
-        return registrationDate;
-    }
-
-    public void setRegistrationDate(String registrationDate) {
-        this.registrationDate = registrationDate;
+    /**
+     * Determines discount eligibility based on age.
+     */
+    public String getDiscountType() {
+        if (age >= 60) return "Senior Citizen";
+        return "N/A";
     }
 
     /**
-     * Calculates discount based on membership type (polymorphism in action).
+     * Whether the customer can login (is an app user with credentials).
      */
-    public double getDiscount() {
-        switch (membershipType) {
-            case "VIP":
-                return 0.20; // 20% discount
-            case "PREMIUM":
-                return 0.10; // 10% discount
-            case "REGULAR":
-            default:
-                return 0.0;  // No discount
-        }
+    public boolean canLogin() {
+        return "Yes".equalsIgnoreCase(appUser) && getUsername() != null && !getUsername().isEmpty();
     }
 
-    /**
-     * Polymorphic implementation of displayInfo.
-     */
     @Override
     public String displayInfo() {
         return String.format(
             "=== CUSTOMER PROFILE ===\n" +
-            "ID:           %d\n" +
-            "Username:     %s\n" +
-            "Full Name:    %s\n" +
+            "Customer No:  %d\n" +
+            "Name:         %s\n" +
+            "Age:          %d\n" +
             "Email:        %s\n" +
-            "Phone:        %s\n" +
-            "Membership:   %s\n" +
-            "Registered:   %s\n" +
-            "Discount:     %.0f%%\n" +
+            "Mobile:       %s\n" +
+            "App User:     %s\n" +
+            "Username:     %s\n" +
             "========================",
-            getUserId(), getUsername(), getFullName(),
-            getEmail(), phoneNumber, membershipType,
-            registrationDate, getDiscount() * 100
-        );
+            customerNo, name, age, emailAddress, mobileNo, appUser,
+            getUsername() != null ? getUsername() : "N/A");
     }
 
     @Override
     public String toString() {
-        return String.format("| %-4d | %-15s | %-20s | %-25s | %-13s | %-9s | %-10s |",
-                getUserId(), getUsername(), getFullName(), getEmail(),
-                phoneNumber, membershipType, registrationDate);
+        return String.format("| %-6d | %-25s | %-3d | %-30s | %-13s | %-3s |",
+                customerNo, name, age, emailAddress, mobileNo, appUser);
     }
 
     public static String getTableHeader() {
-        return String.format("| %-4s | %-15s | %-20s | %-25s | %-13s | %-9s | %-10s |",
-                "ID", "Username", "Full Name", "Email", "Phone", "Member", "Registered");
+        return String.format("| %-6s | %-25s | %-3s | %-30s | %-13s | %-3s |",
+                "CustNo", "Name", "Age", "Email", "Mobile", "App");
     }
 
     public static String getTableDivider() {
-        return "+------+-----------------+----------------------+---------------------------+---------------+-----------+------------+";
+        return "+--------+---------------------------+-----+--------------------------------+---------------+-----+";
     }
 }

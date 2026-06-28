@@ -9,22 +9,13 @@ import com.cinema.service.LoginService;
 import com.cinema.ui.AdminMenu;
 import com.cinema.ui.ConsoleUtils;
 import com.cinema.ui.CustomerMenu;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
  * Main entry point for the Cinema Ticket Reservation System.
- * COMP 013 - Object-Oriented Programming Final Project
- *
- * OOP Concepts Demonstrated:
- * - Encapsulation: Private fields with public getters/setters in all models
- * - Inheritance: User -> Admin, Customer hierarchy
- * - Polymorphism: User.displayInfo() overridden in Admin and Customer
- * - Abstraction: Abstract User class defines contract for subclasses
- * - Exception Handling: Custom exceptions for business logic validation
- * - Constructors: Default, parameterized, and overloaded constructors
- * - Methods: CRUD operations, business logic, utility methods
+ * COMP 013 - OOP Final Project - Group 2
+ * Data source: EDITED GROUP 2_cinema_hall_ticket_sales.xlsx
  */
 public class Main {
 
@@ -32,71 +23,43 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            // Initialize database
             initializeDatabase();
-
-            // Main application loop
             runApplication();
-
         } catch (DatabaseConnectionException e) {
-            ConsoleUtils.showError("Fatal database error: " + e.getMessage());
-            System.out.println("  Please ensure sqlite3 is installed and accessible.");
+            ConsoleUtils.showError("Fatal: " + e.getMessage());
             System.exit(1);
         }
     }
 
-
-    /**
-     * Initializes the database: creates tables and loads sample data if needed.
-     */
     private static void initializeDatabase() throws DatabaseConnectionException {
         DatabaseManager db = DatabaseManager.getInstance();
-
-        // Check if database already exists
         if (db.testConnection() && db.tableExists("movie")) {
-            ConsoleUtils.showInfo("Database loaded successfully.");
+            ConsoleUtils.showInfo("Database loaded.");
             return;
         }
-
         ConsoleUtils.showInfo("Initializing database...");
-
-        // Execute schema
-        String schemaPath = System.getProperty("user.dir") + "/db/schema.sql";
-        if (Files.exists(Paths.get(schemaPath))) {
-            db.executeScript(schemaPath);
-            ConsoleUtils.showSuccess("Database schema created.");
+        String schema = System.getProperty("user.dir") + "/db/schema.sql";
+        String data = System.getProperty("user.dir") + "/db/sample_data.sql";
+        if (Files.exists(Paths.get(schema))) {
+            db.executeScript(schema);
+            ConsoleUtils.showSuccess("Schema created.");
         } else {
-            ConsoleUtils.showError("schema.sql not found at: " + schemaPath);
-            throw new DatabaseConnectionException("Schema file missing", "INIT");
+            throw new DatabaseConnectionException("schema.sql not found", "INIT");
         }
-
-        // Load sample data
-        String dataPath = System.getProperty("user.dir") + "/db/sample_data.sql";
-        if (Files.exists(Paths.get(dataPath))) {
-            db.executeScript(dataPath);
+        if (Files.exists(Paths.get(data))) {
+            db.executeScript(data);
             ConsoleUtils.showSuccess("Sample data loaded.");
         }
-
-        ConsoleUtils.showSuccess("Database initialization complete!");
     }
 
-    /**
-     * Main application loop - displays login menu and routes to role-specific menus.
-     */
+
     private static void runApplication() {
         boolean running = true;
-
         while (running) {
             ConsoleUtils.showBanner();
-
-            String[] options = {
-                "Login as Admin",
-                "Login as Customer",
-                "Register New Customer",
-                "Exit System"
-            };
+            String[] options = { "Login as Admin", "Login as Customer",
+                "Register New Customer", "Exit System" };
             int choice = ConsoleUtils.showMenu("MAIN MENU", options);
-
             try {
                 switch (choice) {
                     case 1 -> loginAdmin();
@@ -104,12 +67,10 @@ public class Main {
                     case 3 -> registerCustomer();
                     case 4 -> {
                         running = false;
-                        System.out.println();
-                        System.out.println("  ╔═══════════════════════════════════════════╗");
-                        System.out.println("  ║   Thank you for using the Cinema System! ║");
-                        System.out.println("  ║   COMP 013 - Group 2 Final Project       ║");
-                        System.out.println("  ╚═══════════════════════════════════════════╝");
-                        System.out.println();
+                        System.out.println("\n  +-------------------------------------------+");
+                        System.out.println("  |   Thank you for using the Cinema System!  |");
+                        System.out.println("  |   COMP 013 - Group 2 Final Project        |");
+                        System.out.println("  +-------------------------------------------+\n");
                     }
                 }
             } catch (DatabaseConnectionException e) {
@@ -118,72 +79,47 @@ public class Main {
         }
     }
 
-
-    /**
-     * Handles admin login flow.
-     */
     private static void loginAdmin() throws DatabaseConnectionException {
         ConsoleUtils.showHeader("ADMIN LOGIN");
-        String username = ConsoleUtils.getInput("Username");
-        String password = ConsoleUtils.getInput("Password");
-
+        String user = ConsoleUtils.getInput("Username");
+        String pass = ConsoleUtils.getInput("Password");
         try {
-            Admin admin = loginService.loginAdmin(username, password);
-            ConsoleUtils.showSuccess("Welcome, " + admin.getFullName() + "!");
+            Admin admin = loginService.loginAdmin(user, pass);
+            ConsoleUtils.showSuccess("Welcome, " + admin.getAdminName() + "!");
             ConsoleUtils.pause();
-
-            // Launch admin menu
-            AdminMenu adminMenu = new AdminMenu(admin);
-            adminMenu.show();
-
+            new AdminMenu(admin).show();
         } catch (InvalidLoginException e) {
-            ConsoleUtils.showError(e.getMessage());
-            ConsoleUtils.pause();
+            ConsoleUtils.showError(e.getMessage()); ConsoleUtils.pause();
         }
     }
 
-    /**
-     * Handles customer login flow.
-     */
     private static void loginCustomer() throws DatabaseConnectionException {
         ConsoleUtils.showHeader("CUSTOMER LOGIN");
-        String username = ConsoleUtils.getInput("Username");
-        String password = ConsoleUtils.getInput("Password");
-
+        String user = ConsoleUtils.getInput("Username");
+        String pass = ConsoleUtils.getInput("Password");
         try {
-            Customer customer = loginService.loginCustomer(username, password);
-            ConsoleUtils.showSuccess("Welcome back, " + customer.getFullName() + "!");
+            Customer customer = loginService.loginCustomer(user, pass);
+            ConsoleUtils.showSuccess("Welcome, " + customer.getName() + "!");
             ConsoleUtils.pause();
-
-            // Launch customer menu
-            CustomerMenu customerMenu = new CustomerMenu(customer);
-            customerMenu.show();
-
+            new CustomerMenu(customer).show();
         } catch (InvalidLoginException e) {
-            ConsoleUtils.showError(e.getMessage());
-            ConsoleUtils.pause();
+            ConsoleUtils.showError(e.getMessage()); ConsoleUtils.pause();
         }
     }
 
-    /**
-     * Handles new customer registration.
-     */
     private static void registerCustomer() throws DatabaseConnectionException {
         ConsoleUtils.showHeader("CUSTOMER REGISTRATION");
-        String username = ConsoleUtils.getInput("Choose username");
-        String password = ConsoleUtils.getInput("Choose password");
-        String fullName = ConsoleUtils.getInput("Full Name");
+        String user = ConsoleUtils.getInput("Choose username");
+        String pass = ConsoleUtils.getInput("Choose password");
+        String name = ConsoleUtils.getInput("Full Name");
+        int age = ConsoleUtils.getIntInput("Age");
         String email = ConsoleUtils.getInput("Email");
-        String phone = ConsoleUtils.getInput("Phone Number");
-
-        Customer newCustomer = loginService.registerCustomer(
-                username, password, fullName, email, phone);
-
-        if (newCustomer != null) {
-            ConsoleUtils.showSuccess("Registration successful! Your ID: " + newCustomer.getUserId());
-            ConsoleUtils.showInfo("You can now login with your credentials.");
+        String mobile = ConsoleUtils.getInput("Mobile No");
+        Customer c = loginService.registerCustomer(user, pass, name, age, email, mobile);
+        if (c != null) {
+            ConsoleUtils.showSuccess("Registered! Customer No: " + c.getCustomerNo());
         } else {
-            ConsoleUtils.showError("Username already taken. Please choose another.");
+            ConsoleUtils.showError("Username already taken.");
         }
         ConsoleUtils.pause();
     }

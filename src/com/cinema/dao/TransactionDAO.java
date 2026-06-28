@@ -2,215 +2,147 @@ package com.cinema.dao;
 
 import com.cinema.exception.DatabaseConnectionException;
 import com.cinema.model.Transaction;
-
 import java.util.*;
 
 /**
  * Data Access Object for Transaction entity.
- * Provides CRUD operations for the transaction table.
  */
 public class TransactionDAO {
 
     private final DatabaseManager db;
 
-    public TransactionDAO() {
-        this.db = DatabaseManager.getInstance();
-    }
+    public TransactionDAO() { this.db = DatabaseManager.getInstance(); }
 
-    /**
-     * Inserts a new transaction into the database.
-     */
-    public int insert(Transaction txn) throws DatabaseConnectionException {
+    public int insert(Transaction t) throws DatabaseConnectionException {
         String sql = String.format(
-            "INSERT INTO \"transaction\" (customer_id, screening_id, seat_id, seat_label, " +
-            "transaction_date, transaction_time, amount_paid, payment_method, status) " +
-            "VALUES (%d, %d, %d, '%s', '%s', '%s', %.2f, '%s', '%s')",
-            txn.getCustomerId(),
-            txn.getScreeningId(),
-            txn.getSeatId(),
-            DatabaseManager.escapeString(txn.getSeatLabel()),
-            DatabaseManager.escapeString(txn.getTransactionDate()),
-            DatabaseManager.escapeString(txn.getTransactionTime()),
-            txn.getAmountPaid(),
-            DatabaseManager.escapeString(txn.getPaymentMethod()),
-            DatabaseManager.escapeString(txn.getStatus())
-        );
+            "INSERT INTO \"transaction\" (transaction_id, transaction_date, transaction_time, " +
+            "customer_no, seat_no, screening_id, movie_id, seat_type_id, reservation_type, " +
+            "admin_id, booking_fee, ticket_price, discount_type, discount_amount, " +
+            "payment_method, total_payment, status) VALUES " +
+            "('%s','%s','%s',%d,%s,'%s',%d,%d,'%s',%s,%.2f,%.2f,'%s',%.2f,%s,%.2f,'%s')",
+            DatabaseManager.escapeString(t.getTransactionId()),
+            DatabaseManager.escapeString(t.getTransactionDate()),
+            DatabaseManager.escapeString(t.getTransactionTime()),
+            t.getCustomerNo(),
+            t.getSeatNo() != null ? "'" + DatabaseManager.escapeString(t.getSeatNo()) + "'" : "NULL",
+            DatabaseManager.escapeString(t.getScreeningId()),
+            t.getMovieId(), t.getSeatTypeId(),
+            DatabaseManager.escapeString(t.getReservationType()),
+            t.getAdminId() != null ? "'" + DatabaseManager.escapeString(t.getAdminId()) + "'" : "NULL",
+            t.getBookingFee(), t.getTicketPrice(),
+            DatabaseManager.escapeString(t.getDiscountType()), t.getDiscountAmount(),
+            t.getPaymentMethod() != null && !t.getPaymentMethod().equals("N/A") ?
+                "'" + DatabaseManager.escapeString(t.getPaymentMethod()) + "'" : "NULL",
+            t.getTotalPayment(), DatabaseManager.escapeString(t.getStatus()));
         return db.executeInsert(sql);
     }
 
 
-    /**
-     * Retrieves a transaction by ID.
-     */
-    public Transaction findById(int transactionId) throws DatabaseConnectionException {
+    public Transaction findById(String transactionId) throws DatabaseConnectionException {
         String sql = String.format(
-            "SELECT * FROM \"transaction\" WHERE transaction_id = %d", transactionId);
+            "SELECT * FROM \"transaction\" WHERE transaction_id = '%s'",
+            DatabaseManager.escapeString(transactionId));
         List<Map<String, String>> results = db.executeQuery(sql);
         if (results.isEmpty()) return null;
         return mapToTransaction(results.get(0));
     }
 
-    /**
-     * Retrieves all transactions.
-     */
     public List<Transaction> findAll() throws DatabaseConnectionException {
-        String sql = "SELECT * FROM \"transaction\" ORDER BY transaction_id DESC";
-        List<Map<String, String>> results = db.executeQuery(sql);
-        List<Transaction> transactions = new ArrayList<>();
-        for (Map<String, String> row : results) {
-            transactions.add(mapToTransaction(row));
-        }
-        return transactions;
+        List<Map<String, String>> results = db.executeQuery(
+            "SELECT * FROM \"transaction\" ORDER BY transaction_date DESC, transaction_time DESC");
+        List<Transaction> txns = new ArrayList<>();
+        for (Map<String, String> row : results) txns.add(mapToTransaction(row));
+        return txns;
     }
 
-    /**
-     * Retrieves all transactions for a specific customer.
-     */
-    public List<Transaction> findByCustomerId(int customerId) throws DatabaseConnectionException {
+    public List<Transaction> findByCustomerNo(int customerNo) throws DatabaseConnectionException {
         String sql = String.format(
-            "SELECT * FROM \"transaction\" WHERE customer_id = %d ORDER BY transaction_date DESC",
-            customerId
-        );
+            "SELECT * FROM \"transaction\" WHERE customer_no = %d ORDER BY transaction_date DESC", customerNo);
         List<Map<String, String>> results = db.executeQuery(sql);
-        List<Transaction> transactions = new ArrayList<>();
-        for (Map<String, String> row : results) {
-            transactions.add(mapToTransaction(row));
-        }
-        return transactions;
+        List<Transaction> txns = new ArrayList<>();
+        for (Map<String, String> row : results) txns.add(mapToTransaction(row));
+        return txns;
     }
 
-    /**
-     * Retrieves all transactions for a specific screening.
-     */
-    public List<Transaction> findByScreeningId(int screeningId) throws DatabaseConnectionException {
+    public List<Transaction> findByScreeningId(String screeningId) throws DatabaseConnectionException {
         String sql = String.format(
-            "SELECT * FROM \"transaction\" WHERE screening_id = %d ORDER BY transaction_id",
-            screeningId
-        );
+            "SELECT * FROM \"transaction\" WHERE screening_id = '%s' AND status='CONFIRMED'",
+            DatabaseManager.escapeString(screeningId));
         List<Map<String, String>> results = db.executeQuery(sql);
-        List<Transaction> transactions = new ArrayList<>();
-        for (Map<String, String> row : results) {
-            transactions.add(mapToTransaction(row));
-        }
-        return transactions;
+        List<Transaction> txns = new ArrayList<>();
+        for (Map<String, String> row : results) txns.add(mapToTransaction(row));
+        return txns;
     }
 
 
-    /**
-     * Checks if a seat is already booked for a screening.
-     */
-    public boolean isSeatBooked(int screeningId, int seatId) throws DatabaseConnectionException {
+    public boolean isSeatBooked(String screeningId, String seatNo) throws DatabaseConnectionException {
         String sql = String.format(
             "SELECT COUNT(*) as cnt FROM \"transaction\" " +
-            "WHERE screening_id=%d AND seat_id=%d AND status='CONFIRMED'",
-            screeningId, seatId
-        );
+            "WHERE screening_id='%s' AND seat_no='%s' AND status='CONFIRMED'",
+            DatabaseManager.escapeString(screeningId), DatabaseManager.escapeString(seatNo));
         List<Map<String, String>> results = db.executeQuery(sql);
         return !results.isEmpty() && Integer.parseInt(results.get(0).get("cnt")) > 0;
     }
 
-    /**
-     * Updates a transaction status.
-     */
-    public boolean updateStatus(int transactionId, String status) throws DatabaseConnectionException {
-        String sql = String.format(
-            "UPDATE \"transaction\" SET status='%s' WHERE transaction_id=%d",
-            DatabaseManager.escapeString(status), transactionId
-        );
-        db.executeUpdate(sql);
+    public boolean cancel(String transactionId) throws DatabaseConnectionException {
+        db.executeUpdate(String.format(
+            "UPDATE \"transaction\" SET status='CANCELLED' WHERE transaction_id='%s'",
+            DatabaseManager.escapeString(transactionId)));
         return true;
     }
 
-    /**
-     * Cancels a transaction.
-     */
-    public boolean cancel(int transactionId) throws DatabaseConnectionException {
-        return updateStatus(transactionId, Transaction.STATUS_CANCELLED);
-    }
-
-    /**
-     * Deletes a transaction by ID.
-     */
-    public boolean delete(int transactionId) throws DatabaseConnectionException {
-        String sql = String.format(
-            "DELETE FROM \"transaction\" WHERE transaction_id = %d", transactionId);
-        db.executeUpdate(sql);
+    public boolean delete(String transactionId) throws DatabaseConnectionException {
+        db.executeUpdate(String.format(
+            "DELETE FROM \"transaction\" WHERE transaction_id = '%s'",
+            DatabaseManager.escapeString(transactionId)));
         return true;
     }
 
-    /**
-     * Gets the total revenue from confirmed transactions.
-     */
     public double getTotalRevenue() throws DatabaseConnectionException {
-        String sql = "SELECT COALESCE(SUM(amount_paid), 0) as total FROM \"transaction\" WHERE status='CONFIRMED'";
-        List<Map<String, String>> results = db.executeQuery(sql);
-        if (!results.isEmpty()) {
-            try {
-                return Double.parseDouble(results.get(0).get("total"));
-            } catch (NumberFormatException e) {
-                return 0.0;
-            }
-        }
+        List<Map<String, String>> r = db.executeQuery(
+            "SELECT COALESCE(SUM(total_payment), 0) as total FROM \"transaction\" WHERE status='CONFIRMED'");
+        if (!r.isEmpty()) { try { return Double.parseDouble(r.get(0).get("total")); } catch (Exception e) {} }
         return 0.0;
     }
 
-
-    /**
-     * Gets revenue by date.
-     */
     public List<Map<String, String>> getRevenueByDate() throws DatabaseConnectionException {
-        String sql = "SELECT transaction_date, SUM(amount_paid) as daily_revenue, COUNT(*) as ticket_count " +
-                     "FROM \"transaction\" WHERE status='CONFIRMED' " +
-                     "GROUP BY transaction_date ORDER BY transaction_date DESC";
-        return db.executeQuery(sql);
+        return db.executeQuery(
+            "SELECT transaction_date, SUM(total_payment) as daily_revenue, COUNT(*) as ticket_count " +
+            "FROM \"transaction\" WHERE status='CONFIRMED' GROUP BY transaction_date ORDER BY transaction_date DESC");
     }
 
-    /**
-     * Gets the most popular movies by ticket sales.
-     */
     public List<Map<String, String>> getPopularMovies() throws DatabaseConnectionException {
-        String sql = "SELECT m.title, COUNT(t.transaction_id) as tickets_sold, " +
-                     "SUM(t.amount_paid) as total_revenue " +
-                     "FROM \"transaction\" t " +
-                     "JOIN screenings s ON t.screening_id = s.screening_id " +
-                     "JOIN movie m ON s.movie_id = m.movie_id " +
-                     "WHERE t.status='CONFIRMED' " +
-                     "GROUP BY m.movie_id ORDER BY tickets_sold DESC";
-        return db.executeQuery(sql);
+        return db.executeQuery(
+            "SELECT m.movie_title, COUNT(t.transaction_id) as tickets_sold, SUM(t.total_payment) as total_revenue " +
+            "FROM \"transaction\" t JOIN movie m ON t.movie_id = m.movie_id " +
+            "WHERE t.status='CONFIRMED' GROUP BY m.movie_id ORDER BY tickets_sold DESC");
     }
 
-    /**
-     * Gets total count of transactions.
-     */
-    public int getCount() throws DatabaseConnectionException {
-        return db.getRowCount("\"transaction\"");
-    }
+    public int getCount() throws DatabaseConnectionException { return db.getRowCount("\"transaction\""); }
 
-    /**
-     * Maps a database row to a Transaction object.
-     */
+
     private Transaction mapToTransaction(Map<String, String> row) {
-        Transaction txn = new Transaction();
-        txn.setTransactionId(parseIntSafe(row.get("transaction_id")));
-        txn.setCustomerId(parseIntSafe(row.get("customer_id")));
-        txn.setScreeningId(parseIntSafe(row.get("screening_id")));
-        txn.setSeatId(parseIntSafe(row.get("seat_id")));
-        txn.setSeatLabel(row.get("seat_label"));
-        txn.setTransactionDate(row.get("transaction_date"));
-        txn.setTransactionTime(row.get("transaction_time"));
-        txn.setAmountPaid(parseDoubleSafe(row.get("amount_paid")));
-        txn.setPaymentMethod(row.get("payment_method"));
-        txn.setStatus(row.get("status"));
-        return txn;
+        Transaction t = new Transaction();
+        t.setTransactionId(row.get("transaction_id"));
+        t.setTransactionDate(row.get("transaction_date"));
+        t.setTransactionTime(row.get("transaction_time"));
+        t.setCustomerNo(parseInt(row.get("customer_no")));
+        t.setSeatNo(row.get("seat_no"));
+        t.setScreeningId(row.get("screening_id"));
+        t.setMovieId(parseInt(row.get("movie_id")));
+        t.setSeatTypeId(parseInt(row.get("seat_type_id")));
+        t.setReservationType(row.get("reservation_type"));
+        t.setAdminId(row.get("admin_id"));
+        t.setBookingFee(parseDouble(row.get("booking_fee")));
+        t.setTicketPrice(parseDouble(row.get("ticket_price")));
+        t.setDiscountType(row.get("discount_type"));
+        t.setDiscountAmount(parseDouble(row.get("discount_amount")));
+        t.setPaymentMethod(row.get("payment_method"));
+        t.setTotalPayment(parseDouble(row.get("total_payment")));
+        t.setStatus(row.get("status"));
+        return t;
     }
 
-    private int parseIntSafe(String value) {
-        try { return Integer.parseInt(value); }
-        catch (Exception e) { return 0; }
-    }
-
-    private double parseDoubleSafe(String value) {
-        try { return Double.parseDouble(value); }
-        catch (Exception e) { return 0.0; }
-    }
+    private int parseInt(String v) { try { return Integer.parseInt(v); } catch (Exception e) { return 0; } }
+    private double parseDouble(String v) { try { return Double.parseDouble(v); } catch (Exception e) { return 0.0; } }
 }
