@@ -1,0 +1,22 @@
+# Compiled class files
+out/
+*.class
+
+# SQLite database (regenerated on first run)
+db/cinema.db
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# Gradle
+.gradle/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
