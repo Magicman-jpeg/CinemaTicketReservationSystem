@@ -15,7 +15,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo [*] Compiling Java sources...
 if exist out rmdir /s /q out
-javac -d out -sourcepath src src\com\cinema\Main.java
+javac -d out src\*.java
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Compilation failed!
     pause
@@ -28,12 +28,12 @@ if not exist "db\cinema.db" (
     echo [*] Initializing database...
     where sqlite3 >nul 2>nul
     if %ERRORLEVEL% NEQ 0 (
-        echo [i] sqlite3 not found - database will be created on first run.
-        echo [i] The app will auto-initialize if schema.sql exists.
+        echo [i] sqlite3 not found on PATH.
+        echo [i] The app will try to initialize automatically.
     ) else (
         sqlite3 db\cinema.db < db\schema.sql
         sqlite3 db\cinema.db < db\sample_data.sql
-        echo [+] Database initialized.
+        echo [+] Database initialized with sample data.
     )
 ) else (
     echo [*] Database already exists.
@@ -44,5 +44,5 @@ echo [*] Starting application...
 echo ==============================================
 echo.
 
-java -cp out com.cinema.Main
+java -cp out Main
 pause
