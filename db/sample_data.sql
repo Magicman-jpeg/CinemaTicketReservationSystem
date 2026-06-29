@@ -56,6 +56,7 @@ INSERT OR IGNORE INTO movie (movie_id, movie_title, genre_id, movie_duration, du
 
 -- ========== ADMIN DATA (10 staff) ==========
 INSERT OR IGNORE INTO admin (admin_id, role, admin_name, admin_username, admin_pass) VALUES
+(1001, 'Default Admin', 'RandHive', 'admin', 'admin123'),
 (2409, 'Manager', 'Patrice', 'fairytopia', 'popcornmanager'),
 (2102, 'Assistant Manager', 'Clifferson', 'highschooldxd', '12345pogisijay'),
 (1207, 'Box Office Staff', 'Henry', 'magicman21', 'fordxsya'),
