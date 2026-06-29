@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "=============================================="
 echo "  Cinema Ticket Reservation System"
-echo "  COMP 013 - OOP Final Project - Group 2"
+echo "  COMP 009 - OOP Final Project - Group 1"
 echo "=============================================="
 echo ""
 

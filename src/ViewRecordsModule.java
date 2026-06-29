@@ -4,9 +4,16 @@ import java.util.*;
  * MODULE 4: ViewRecordsModule
  * Displays records stored in the database.
  * Uses table-like text display for console output.
+ *
+ * ADMIN ACCESS:  Can view ALL records (movies, screenings, all customers, all transactions)
+ * CUSTOMER ACCESS: Can ONLY view movies, screenings, their OWN profile, their OWN transactions
  */
 public class ViewRecordsModule {
 
+    /**
+     * Admin view menu - shows all record types.
+     * This method is only called from the Admin menu.
+     */
     public static void show() {
         System.out.println("\n  -------- VIEW RECORDS --------");
         System.out.println("  [1] View Movies");
@@ -24,6 +31,9 @@ public class ViewRecordsModule {
         }
     }
 
+    /**
+     * Displays all movies - accessible to BOTH Admin and Customer.
+     */
     public static void displayMovies() {
         System.out.println("\n  -------- ALL MOVIES --------");
         List<Map<String, String>> movies = DatabaseHelper.query(
@@ -48,7 +58,9 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
-
+    /**
+     * Displays all screenings - accessible to BOTH Admin and Customer.
+     */
     public static void displayScreenings() {
         System.out.println("\n  -------- ALL SCREENINGS --------");
         List<Map<String, String>> list = DatabaseHelper.query(
@@ -72,6 +84,10 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
+    /**
+     * Displays ALL customers - ADMIN ONLY.
+     * Customers cannot see other customers' data.
+     */
     public static void displayCustomers() {
         System.out.println("\n  -------- ALL CUSTOMERS --------");
         List<Map<String, String>> list = DatabaseHelper.query(
@@ -91,6 +107,10 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
+    /**
+     * Displays ALL transactions - ADMIN ONLY.
+     * Customers can only see their own transactions via displayMyTransactions().
+     */
     public static void displayTransactions() {
         System.out.println("\n  -------- ALL TRANSACTIONS --------");
         List<Map<String, String>> list = DatabaseHelper.query(
@@ -108,6 +128,62 @@ public class ViewRecordsModule {
                 t.get("screening_id"), t.get("total_payment"), t.get("status"));
         }
         System.out.println("  Total: " + list.size());
+        InputValidator.pause();
+    }
+
+    /**
+     * Displays the CURRENT CUSTOMER's own profile only.
+     * CUSTOMER ONLY - shows only their own record from the database.
+     */
+    public static void displayMyProfile() {
+        int myId = LoginModule.getId();
+        System.out.println("\n  -------- MY PROFILE --------");
+        List<Map<String, String>> result = DatabaseHelper.query(String.format(
+            "SELECT * FROM customer WHERE customer_no = %d", myId));
+
+        if (result.isEmpty()) {
+            System.out.println("  [!] Profile not found.");
+        } else {
+            var c = result.get(0);
+            System.out.println("  Customer No:  " + c.get("customer_no"));
+            System.out.println("  Name:         " + c.get("name"));
+            System.out.println("  Age:          " + c.get("age"));
+            System.out.println("  Email:        " + c.get("email_address"));
+            System.out.println("  Mobile:       " + c.get("mobile_no"));
+            System.out.println("  App User:     " + c.get("app_user"));
+            System.out.println("  Username:     " + c.get("customer_username"));
+        }
+        InputValidator.pause();
+    }
+
+    /**
+     * Displays ONLY the current customer's own transactions.
+     * CUSTOMER ONLY - filtered by their customer_no.
+     * Customers cannot see other customers' transactions.
+     */
+    public static void displayMyTransactions() {
+        int myId = LoginModule.getId();
+        System.out.println("\n  -------- MY TRANSACTIONS --------");
+        List<Map<String, String>> list = DatabaseHelper.query(String.format(
+            "SELECT * FROM \"transaction\" WHERE customer_no = %d ORDER BY transaction_date DESC",
+            myId));
+
+        if (list.isEmpty()) {
+            System.out.println("  You have no transactions yet.");
+            InputValidator.pause();
+            return;
+        }
+
+        System.out.printf("  %-14s | %-10s | %-5s | %-4s | %-7s | %-8s | %-9s%n",
+            "TxnID", "Date", "Time", "Seat", "ScrID", "Total", "Status");
+        System.out.println("  " + "-".repeat(70));
+        for (var t : list) {
+            System.out.printf("  %-14s | %-10s | %-5s | %-4s | %-7s | PHP %-4s | %-9s%n",
+                t.get("transaction_id"), t.get("transaction_date"), t.get("transaction_time"),
+                t.get("seat_no") != null ? t.get("seat_no") : "N/A",
+                t.get("screening_id"), t.get("total_payment"), t.get("status"));
+        }
+        System.out.println("  Total: " + list.size() + " transaction(s)");
         InputValidator.pause();
     }
 }

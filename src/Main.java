@@ -1,7 +1,7 @@
 /**
  * CINEMA TICKET RESERVATION SYSTEM
- * COMP 013 - Object-Oriented Programming Final Project
- * Group 2 - Cinema Hall Ticket Sales
+ * COMP 009 - Object-Oriented Programming Final Project
+ * Group 1 - Cinema Hall Ticket Sales
  *
  * Entry point. Initializes the database and starts the login loop.
  *
@@ -40,7 +40,7 @@ public class Main {
 
             System.out.println("\n  ============================================");
             System.out.println("    Thank you for using the Cinema System!");
-            System.out.println("    COMP 013 - Group 2 Final Project");
+            System.out.println("    COMP 009 - Group 1 Final Project");
             System.out.println("  ============================================\n");
 
         } catch (Exception e) {

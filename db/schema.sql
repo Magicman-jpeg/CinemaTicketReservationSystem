@@ -1,5 +1,5 @@
 -- Cinema Ticket Reservation System - Database Schema
--- COMP 013 OOP Final Project - Group 2
+-- COMP 009 OOP Final Project - Group 1
 -- Based on: EDITED GROUP 2_cinema_hall_ticket_sales.xlsx
 -- SQLite Database
 

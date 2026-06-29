@@ -2,54 +2,132 @@
  * MODULE 2: MainMenuModule
  * Displays the main menu after successful login.
  * Routes user to different system features based on their role.
+ *
+ * ADMIN ACCESS: Full access to all features (View, Search, Add, Update, Delete, Reserve, Reports)
+ *
+ * CUSTOMER ACCESS (restricted):
+ *   VIEW    - view movies, view screenings, view their OWN customer record, view their OWN transaction records
+ *   SEARCH  - search movies, search screenings, search their OWN transaction records
+ *   RESERVE - reserve a seat
+ *   (Customers CANNOT access: Add, Update, Delete, Reports, or other customers' data)
  */
 public class MainMenuModule {
 
     /**
      * Displays and handles the main menu loop.
+     * Shows different menu options depending on whether user is Admin or Customer.
      */
     public static void show() {
         boolean running = true;
 
         while (running) {
-            System.out.println("\n  ============================================");
-            System.out.println("     MAIN MENU - Logged in as: " + LoginModule.getName());
-            System.out.println("     Role: " + LoginModule.getRole());
-            System.out.println("  ============================================");
-            System.out.println("  [1] View Records");
-            System.out.println("  [2] Search Record");
-            System.out.println("  [3] Add Record");
-            System.out.println("  [4] Update Record");
-            System.out.println("  [5] Delete Record");
-            System.out.println("  [6] Reserve a Seat");
-            System.out.println("  [7] Generate Report");
-            System.out.println("  [8] Logout");
-            System.out.println();
-
-            int choice = InputValidator.getInt("Enter choice", 1, 8);
-
-            try {
-                switch (choice) {
-                    case 1 -> ViewRecordsModule.show();
-                    case 2 -> SearchRecordModule.show();
-                    case 3 -> AddRecordModule.show();
-                    case 4 -> UpdateRecordModule.show();
-                    case 5 -> DeleteRecordModule.show();
-                    case 6 -> reserveSeat();
-                    case 7 -> ReportModule.show();
-                    case 8 -> {
-                        LoginModule.logout();
-                        running = false;
-                    }
-                }
-            } catch (Exception e) {
-                ExceptionHandler.handle(e, "Main Menu");
+            if (LoginModule.isAdmin()) {
+                // ADMIN MENU - Full access to all features
+                running = showAdminMenu();
+            } else {
+                // CUSTOMER MENU - Restricted access
+                running = showCustomerMenu();
             }
         }
     }
 
     /**
+     * Admin menu - has access to ALL system features.
+     */
+    private static boolean showAdminMenu() {
+        System.out.println("\n  ============================================");
+        System.out.println("     ADMIN MENU - Logged in as: " + LoginModule.getName());
+        System.out.println("     Role: " + LoginModule.getRole());
+        System.out.println("  ============================================");
+        System.out.println("  [1] View Records");
+        System.out.println("  [2] Search Record");
+        System.out.println("  [3] Add Record");
+        System.out.println("  [4] Update Record");
+        System.out.println("  [5] Delete Record");
+        System.out.println("  [6] Reserve a Seat");
+        System.out.println("  [7] Generate Report");
+        System.out.println("  [8] Logout");
+        System.out.println();
+
+        int choice = InputValidator.getInt("Enter choice", 1, 8);
+
+        try {
+            switch (choice) {
+                case 1 -> ViewRecordsModule.show();       // Admin sees ALL records
+                case 2 -> SearchRecordModule.show();      // Admin can search ALL
+                case 3 -> AddRecordModule.show();         // Admin only
+                case 4 -> UpdateRecordModule.show();      // Admin only
+                case 5 -> DeleteRecordModule.show();      // Admin only
+                case 6 -> reserveSeat();                  // Both can reserve
+                case 7 -> ReportModule.show();            // Admin only
+                case 8 -> {
+                    LoginModule.logout();
+                    return false; // Exit menu loop
+                }
+            }
+        } catch (Exception e) {
+            ExceptionHandler.handle(e, "Admin Menu");
+        }
+        return true; // Continue loop
+    }
+
+    /**
+     * Customer menu - RESTRICTED access.
+     * Customers can ONLY:
+     *   - View movies, screenings, their OWN record, their OWN transactions
+     *   - Search movies, screenings, their OWN transactions
+     *   - Reserve a seat
+     * Customers CANNOT: Add, Update, Delete records, or Generate Reports.
+     */
+    private static boolean showCustomerMenu() {
+        System.out.println("\n  ============================================");
+        System.out.println("     CUSTOMER MENU - Logged in as: " + LoginModule.getName());
+        System.out.println("     Customer No: " + LoginModule.getId());
+        System.out.println("  ============================================");
+        System.out.println("  [1] View Movies");
+        System.out.println("  [2] View Screenings");
+        System.out.println("  [3] View My Profile");
+        System.out.println("  [4] View My Transactions");
+        System.out.println("  [5] Search Movie");
+        System.out.println("  [6] Search Screening");
+        System.out.println("  [7] Search My Transactions");
+        System.out.println("  [8] Reserve a Seat");
+        System.out.println("  [9] Logout");
+        System.out.println();
+
+        int choice = InputValidator.getInt("Enter choice", 1, 9);
+
+        try {
+            switch (choice) {
+                // VIEW - only movies, screenings, OWN profile, OWN transactions
+                case 1 -> ViewRecordsModule.displayMovies();
+                case 2 -> ViewRecordsModule.displayScreenings();
+                case 3 -> ViewRecordsModule.displayMyProfile();           // OWN record only
+                case 4 -> ViewRecordsModule.displayMyTransactions();      // OWN transactions only
+
+                // SEARCH - only movies, screenings, OWN transactions
+                case 5 -> SearchRecordModule.searchMovie();
+                case 6 -> SearchRecordModule.searchScreening();
+                case 7 -> SearchRecordModule.searchMyTransactions();      // OWN transactions only
+
+                // RESERVE A SEAT
+                case 8 -> reserveSeat();
+
+                // LOGOUT
+                case 9 -> {
+                    LoginModule.logout();
+                    return false; // Exit menu loop
+                }
+            }
+        } catch (Exception e) {
+            ExceptionHandler.handle(e, "Customer Menu");
+        }
+        return true; // Continue loop
+    }
+
+    /**
      * Seat reservation flow.
+     * Available to BOTH Admin and Customer users.
      */
     private static void reserveSeat() {
         System.out.println("\n  -------- RESERVE A SEAT --------");

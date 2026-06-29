@@ -1,6 +1,6 @@
 # Cinema Ticket Reservation System
 
-## COMP 013 - Object-Oriented Programming Final Project | Group 2
+## COMP 009 - Object-Oriented Programming Final Project | Group 1
 
 Console-based Java application with SQLite database integration.
 

@@ -20,7 +20,7 @@ public class LoginModule {
     public static boolean login() {
         System.out.println("\n  ============================================");
         System.out.println("       CINEMA TICKET RESERVATION SYSTEM");
-        System.out.println("       COMP 013 - Group 2 Final Project");
+        System.out.println("       COMP 009 - Group 1 Final Project");
         System.out.println("  ============================================\n");
         System.out.println("  -------- LOGIN --------");
 

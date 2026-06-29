@@ -4,9 +4,16 @@ import java.util.*;
  * MODULE 5: SearchRecordModule
  * Allows users to search records by unique ID or keyword.
  * Displays a message if record is not found.
+ *
+ * ADMIN ACCESS:  Can search ALL records (movies, customers, transactions, screenings)
+ * CUSTOMER ACCESS: Can ONLY search movies, screenings, and their OWN transactions
  */
 public class SearchRecordModule {
 
+    /**
+     * Admin search menu - can search ALL record types.
+     * This method is only called from the Admin menu.
+     */
     public static void show() {
         System.out.println("\n  -------- SEARCH RECORD --------");
         System.out.println("  [1] Search Movie (by ID or title)");
@@ -24,7 +31,11 @@ public class SearchRecordModule {
         }
     }
 
-    private static void searchMovie() {
+    /**
+     * Search movies by ID or title keyword.
+     * Accessible to BOTH Admin and Customer.
+     */
+    public static void searchMovie() {
         String keyword = InputValidator.getString("Enter Movie ID or title keyword");
         List<Map<String, String>> results;
 
@@ -40,8 +51,10 @@ public class SearchRecordModule {
                 "SELECT m.*, g.movie_genre, s.movie_status FROM movie m " +
                 "LEFT JOIN movie_genre g ON m.genre_id = g.genre_id " +
                 "LEFT JOIN movie_status s ON m.status_id = s.status_id " +
-                "WHERE m.movie_title LIKE '%%%s%%'", DatabaseHelper.escape(keyword)));
+                "WHERE m.movie_title LIKE '%%%s%%'",
+                DatabaseHelper.escape(keyword)));
         }
+
 
         if (results.isEmpty()) {
             ExceptionHandler.handleNotFound("Movie", keyword);
@@ -61,6 +74,10 @@ public class SearchRecordModule {
         InputValidator.pause();
     }
 
+    /**
+     * Search customers by No or name.
+     * ADMIN ONLY - customers cannot search other customers.
+     */
     private static void searchCustomer() {
         String keyword = InputValidator.getString("Enter Customer No or name");
         List<Map<String, String>> results;
@@ -91,6 +108,11 @@ public class SearchRecordModule {
         InputValidator.pause();
     }
 
+
+    /**
+     * Search ALL transactions by ID.
+     * ADMIN ONLY.
+     */
     private static void searchTransaction() {
         String id = InputValidator.getString("Enter Transaction ID");
         var results = DatabaseHelper.query(String.format(
@@ -112,7 +134,11 @@ public class SearchRecordModule {
         InputValidator.pause();
     }
 
-    private static void searchScreening() {
+    /**
+     * Search screenings by ID.
+     * Accessible to BOTH Admin and Customer.
+     */
+    public static void searchScreening() {
         String id = InputValidator.getString("Enter Screening ID");
         var results = DatabaseHelper.query(String.format(
             "SELECT s.*, m.movie_title, st.seat_type, st.ticket_price FROM screenings s " +
@@ -131,6 +157,33 @@ public class SearchRecordModule {
             System.out.println("  Cinema:      " + s.get("cinema_no"));
             System.out.println("  Seat Type:   " + s.get("seat_type"));
             System.out.println("  Price:       PHP " + s.get("ticket_price"));
+        }
+        InputValidator.pause();
+    }
+
+    /**
+     * Search the CURRENT CUSTOMER's own transactions only.
+     * CUSTOMER ONLY - filtered by their customer_no.
+     * Customers cannot search other customers' transactions.
+     */
+    public static void searchMyTransactions() {
+        int myId = LoginModule.getId();
+        String keyword = InputValidator.getString("Enter Transaction ID to search");
+
+        var results = DatabaseHelper.query(String.format(
+            "SELECT * FROM \"transaction\" WHERE transaction_id = '%s' AND customer_no = %d",
+            DatabaseHelper.escape(keyword), myId));
+
+        if (results.isEmpty()) {
+            ExceptionHandler.handleNotFound("Transaction (yours)", keyword);
+        } else {
+            var t = results.get(0);
+            System.out.println("\n  Transaction: " + t.get("transaction_id"));
+            System.out.println("  Date/Time:   " + t.get("transaction_date") + " " + t.get("transaction_time"));
+            System.out.println("  Screening:   " + t.get("screening_id"));
+            System.out.println("  Seat:        " + t.get("seat_no"));
+            System.out.println("  Total:       PHP " + t.get("total_payment"));
+            System.out.println("  Status:      " + t.get("status"));
         }
         InputValidator.pause();
     }

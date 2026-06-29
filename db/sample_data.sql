@@ -1,6 +1,6 @@
 -- Cinema Ticket Reservation System - Sample Data
 -- Source: EDITED GROUP 2_cinema_hall_ticket_sales.xlsx
--- COMP 013 OOP Final Project - Group 2
+-- COMP 009 OOP Final Project - Group 1
 
 PRAGMA foreign_keys = ON;
 
