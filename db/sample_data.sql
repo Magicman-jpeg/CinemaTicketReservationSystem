@@ -129,7 +129,7 @@ INSERT OR IGNORE INTO screenings (screening_id, screening_day, screening_date, t
 ('TUE-12', 'TUE', '2026-06-09', '19:00', 3, 7, 2);
 
 
--- ========== CUSTOMER DATA (first 10 from 296 total in Excel) ==========
+-- ========== CUSTOMER DATA (first 50 from 296 total in Excel) ==========
 INSERT OR IGNORE INTO customer (customer_no, name, age, email_address, app_user, customer_username, customer_pass, mobile_no) VALUES
 (1001, 'Ford Levisberg', 20, 'levisfordisberg@gmail.com', 'Yes', 'FordMustang', 'seat71HEEHEE', '09625872041'),
 (1002, 'Jayson Clyde Aravelo', 20, 'jaysonclyde92@gmail.com', 'Yes', 'Clydejayy2005', 'romancefan01_', '09178032820'),
@@ -140,7 +140,7 @@ INSERT OR IGNORE INTO customer (customer_no, name, age, email_address, app_user,
 (1007, 'Mari Chan Argon', 50, 'bigjom1201@gmail.com', 'Yes', 'meriChanmas25', 'christmasDay!', '09674206966'),
 (1008, 'Micha Ordinance', 44, 'mikmart8080@gmail.com', 'No', NULL, NULL, '09639935269'),
 (1009, 'Azriel Minguita', 64, 'azhudzon13@gmail.com', 'No', NULL, NULL, '09606538694'),
-(1010, 'Miguel Dimagiba', 70, 'miguelitosayskrim@gmail.com', 'No', NULL, NULL, '09562948371'),
+(1010, 'Miguel Dimagiba', 70, 'miguelitosayskrim@gmail.com', 'No', NULL, NULL, '09562948371')
 
 -- ========== TRANSACTION DATA (10 confirmed transactions from Excel) ==========
 INSERT OR IGNORE INTO "transaction" (transaction_id, transaction_date, transaction_time, customer_no, seat_no, screening_id, movie_id, seat_type_id, reservation_type, admin_id, booking_fee, ticket_price, discount_type, discount_amount, payment_method, total_payment, status) VALUES
