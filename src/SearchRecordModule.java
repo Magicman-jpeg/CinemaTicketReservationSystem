@@ -1,19 +1,17 @@
-import java.util.*;
+/* ============================================
+ * MODULE 5: Search Record Module
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: Allows users to search records using a unique identifier or keyword.
+            Displays a message if the record is not found.
+ * ============================================ */
 
-/**
- * MODULE 5: SearchRecordModule
- * Allows users to search records by unique ID or keyword.
- * Displays a message if record is not found.
- *
- * ADMIN ACCESS:  Can search ALL records (movies, customers, transactions, screenings)
- * CUSTOMER ACCESS: Can ONLY search movies, screenings, and their OWN transactions
- */
+import java.util.*; // Includes the Scanner class
+import java.util.Scanner;
+
 public class SearchRecordModule {
-
-    /**
-     * Admin search menu - can search ALL record types.
-     * This method is only called from the Admin menu.
-     */
+    // FUNCTION: Displays the Menu for Searching records
     public static void show() {
         System.out.println("\n  -------- SEARCH RECORD --------");
         System.out.println("  [1] Search Movie (by ID or title)");
@@ -23,6 +21,7 @@ public class SearchRecordModule {
         System.out.println("  [5] Back");
 
         int choice = InputValidator.getInt("Choose", 1, 5);
+        // FUNCTION: Redirects the user to the method of their chosen action
         switch (choice) {
             case 1 -> searchMovie();
             case 2 -> searchCustomer();
@@ -31,10 +30,8 @@ public class SearchRecordModule {
         }
     }
 
-    /**
-     * Search movies by ID or title keyword.
-     * Accessible to BOTH Admin and Customer.
-     */
+    // FUNCTION: Searches for a movie by ID or title keyword
+    //           Displays movie details if found
     public static void searchMovie() {
         String keyword = InputValidator.getString("Enter Movie ID or title keyword");
         List<Map<String, String>> results;
@@ -74,10 +71,8 @@ public class SearchRecordModule {
         InputValidator.pause();
     }
 
-    /**
-     * Search customers by No or name.
-     * ADMIN ONLY - customers cannot search other customers.
-     */
+    // FUNCTION: Searches for a customer by customer number or name
+    //           Displays customer details if found
     private static void searchCustomer() {
         String keyword = InputValidator.getString("Enter Customer No or name");
         List<Map<String, String>> results;
@@ -109,10 +104,8 @@ public class SearchRecordModule {
     }
 
 
-    /**
-     * Search ALL transactions by ID.
-     * ADMIN ONLY.
-     */
+    // FUNCTION: Searches for a transaction by transaction ID
+    //           Displays transaction details if found
     private static void searchTransaction() {
         String id = InputValidator.getString("Enter Transaction ID");
         var results = DatabaseHelper.query(String.format(
@@ -134,10 +127,8 @@ public class SearchRecordModule {
         InputValidator.pause();
     }
 
-    /**
-     * Search screenings by ID.
-     * Accessible to BOTH Admin and Customer.
-     */
+    // FUNCTION: Searches for a screening by screening ID
+    //           Displays screening details if found
     public static void searchScreening() {
         String id = InputValidator.getString("Enter Screening ID");
         var results = DatabaseHelper.query(String.format(
@@ -161,11 +152,8 @@ public class SearchRecordModule {
         InputValidator.pause();
     }
 
-    /**
-     * Search the CURRENT CUSTOMER's own transactions only.
-     * CUSTOMER ONLY - filtered by their customer_no.
-     * Customers cannot search other customers' transactions.
-     */
+    // FUNCTION: Search the CURRENT CUSTOMER's own transactions only
+    //           Customers cannot search other customers' transactions
     public static void searchMyTransactions() {
         int myId = LoginModule.getId();
         String keyword = InputValidator.getString("Enter Transaction ID to search");
