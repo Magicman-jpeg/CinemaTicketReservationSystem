@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 2: Main Menu Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: 
  * ADMIN ACCESS: Full access to all features (View, Search, Add, Update, Delete, Reserve, Reports)
