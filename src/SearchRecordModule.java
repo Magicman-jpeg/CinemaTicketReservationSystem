@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 5: Search Record Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: Allows users to search records using a unique identifier or keyword.
             Displays a message if the record is not found.
