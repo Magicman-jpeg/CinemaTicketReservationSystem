@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 10: Exception Handling Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: Handles exceptions in the system using try-catch blocks.
             Once error is encountered, it gives error messages for the user.
