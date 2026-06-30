@@ -1,19 +1,17 @@
-import java.util.*;
+/* ============================================
+ * MODULE 4: View Records Module
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: Allows users to display records stored in the database.
+ * ============================================ */
 
-/**
- * MODULE 4: ViewRecordsModule
- * Displays records stored in the database.
- * Uses table-like text display for console output.
- *
- * ADMIN ACCESS:  Can view ALL records (movies, screenings, all customers, all transactions)
- * CUSTOMER ACCESS: Can ONLY view movies, screenings, their OWN profile, their OWN transactions
- */
+import java.util.*; // Includes the Scanner class
+import java.util.Scanner;
+
 public class ViewRecordsModule {
 
-    /**
-     * Admin view menu - shows all record types.
-     * This method is only called from the Admin menu.
-     */
+    // FUNCTION: Display the Menu for Viewing records
     public static void show() {
         System.out.println("\n  -------- VIEW RECORDS --------");
         System.out.println("  [1] View Movies");
@@ -23,6 +21,7 @@ public class ViewRecordsModule {
         System.out.println("  [5] Back");
 
         int choice = InputValidator.getInt("Choose", 1, 5);
+        // FUNCTION: Redirects the user to the method of their chosen action
         switch (choice) {
             case 1 -> displayMovies();
             case 2 -> displayScreenings();
@@ -31,9 +30,8 @@ public class ViewRecordsModule {
         }
     }
 
-    /**
-     * Displays all movies - accessible to BOTH Admin and Customer.
-     */
+    // FUNCTION: Displays all movies stored in the database
+    //           Includes genre, duration, release date, status, and age rating
     public static void displayMovies() {
         System.out.println("\n  -------- ALL MOVIES --------");
         List<Map<String, String>> movies = DatabaseHelper.query(
@@ -58,9 +56,8 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
-    /**
-     * Displays all screenings - accessible to BOTH Admin and Customer.
-     */
+    // FUNCTION: Displays all screenings stored in the database
+    //           Includes movie title, seat type, price, and cinema hall
     public static void displayScreenings() {
         System.out.println("\n  -------- ALL SCREENINGS --------");
         List<Map<String, String>> list = DatabaseHelper.query(
@@ -84,10 +81,7 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
-    /**
-     * Displays ALL customers - ADMIN ONLY.
-     * Customers cannot see other customers' data.
-     */
+    // FUNCTION: Displays all customers (with their basic details) stored in the database
     public static void displayCustomers() {
         System.out.println("\n  -------- ALL CUSTOMERS --------");
         List<Map<String, String>> list = DatabaseHelper.query(
@@ -107,10 +101,8 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
-    /**
-     * Displays ALL transactions - ADMIN ONLY.
-     * Customers can only see their own transactions via displayMyTransactions().
-     */
+    // FUNCTION: Displays all transactions stored in the database
+    //           Includes transaction ID, date/time, customer, screening, seat, total, and status
     public static void displayTransactions() {
         System.out.println("\n  -------- ALL TRANSACTIONS --------");
         List<Map<String, String>> list = DatabaseHelper.query(
@@ -131,10 +123,8 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
-    /**
-     * Displays the CURRENT CUSTOMER's own profile only.
-     * CUSTOMER ONLY - shows only their own record from the database.
-     */
+    // FUNCTION: Displays the CURRENT CUSTOMER's own profile only.
+    //           CUSTOMER ONLY - shows only their own record from the database.
     public static void displayMyProfile() {
         int myId = LoginModule.getId();
         System.out.println("\n  -------- MY PROFILE --------");
@@ -156,11 +146,8 @@ public class ViewRecordsModule {
         InputValidator.pause();
     }
 
-    /**
-     * Displays ONLY the current customer's own transactions.
-     * CUSTOMER ONLY - filtered by their customer_no.
-     * Customers cannot see other customers' transactions.
-     */
+    // FUNCTION: Displays ONLY the current customer's own transactions.
+    //           Customers cannot see other customers' transactions.
     public static void displayMyTransactions() {
         int myId = LoginModule.getId();
         System.out.println("\n  -------- MY TRANSACTIONS --------");
