@@ -1,12 +1,17 @@
-import java.util.*;
+/* ============================================
+ * MODULE 6: Update Record Module
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: Allows users to update or edit existing records.
+            Confirms if the record exists before updating.
+ * ============================================ */
 
-/**
- * MODULE 6: UpdateRecordModule
- * Allows users to update/edit existing records.
- * Confirms that the record exists before updating.
- */
+import java.util.*; // Includes the Scanner class
+import java.util.Scanner;
+
 public class UpdateRecordModule {
-
+    // FUNCTION: Displays the Menu for Updating records
     public static void show() {
         System.out.println("\n  -------- UPDATE RECORD --------");
         System.out.println("  [1] Update Movie");
@@ -15,6 +20,7 @@ public class UpdateRecordModule {
         System.out.println("  [4] Back");
 
         int choice = InputValidator.getInt("Choose", 1, 4);
+        // FUNCTION: Redirects the user to the method of their chosen action
         switch (choice) {
             case 1 -> updateMovie();
             case 2 -> updateCustomer();
@@ -22,10 +28,12 @@ public class UpdateRecordModule {
         }
     }
 
+    // FUNCTION: Updates a movie record by ID
+    //           Allows editing of title and status
     private static void updateMovie() {
         int id = InputValidator.getInt("Enter Movie ID to update");
 
-        // Verify record exists
+        // FUNCTION: Verify if the record exists
         var results = DatabaseHelper.query(String.format(
             "SELECT * FROM movie WHERE movie_id = %d", id));
         if (results.isEmpty()) {
@@ -63,6 +71,8 @@ public class UpdateRecordModule {
         InputValidator.pause();
     }
 
+    // FUNCTION: Updates a customer record by customer number.
+    //           Allows editing of name, email, and mobile number.
     private static void updateCustomer() {
         int no = InputValidator.getInt("Enter Customer No to update");
 
@@ -110,6 +120,8 @@ public class UpdateRecordModule {
         InputValidator.pause();
     }
 
+    // FUNCTION: Updates a screening record by screening ID.
+    //           Allows editing of time slot
     private static void updateScreening() {
         String id = InputValidator.getString("Enter Screening ID to update");
 
