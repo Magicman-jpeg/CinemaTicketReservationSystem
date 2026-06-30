@@ -1,18 +1,21 @@
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+/* ============================================
+ * ADDITIONAL MODULE 1: Database Helper
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: Handles all SQLite database operations
+ * ============================================ */
 
-/**
- * DatabaseHelper - Handles all SQLite database operations.
- * Uses the sqlite3 command-line tool via ProcessBuilder.
- */
+import java.io.*; 
+import java.nio.file.*;
+import java.util.*; // Includes the Scanner class
+import java.util.Scanner;
+
 public class DatabaseHelper {
 
     private static final String DB_PATH = "db" + File.separator + "cinema.db";
 
-    /**
-     * Executes a SQL query and returns results as a list of maps.
-     */
+    // FUNCTION: Executes a SQL query and returns results as a list of maps
     public static List<Map<String, String>> query(String sql) {
         List<Map<String, String>> results = new ArrayList<>();
         try {
@@ -53,9 +56,7 @@ public class DatabaseHelper {
         return results;
     }
 
-    /**
-     * Executes a SQL statement (INSERT, UPDATE, DELETE).
-     */
+    // FUNCTION: Executes SQL statements (INSERT, UPDATE, DELETE)
     public static boolean execute(String sql) {
         try {
             String wrapped = sql.trim();
@@ -83,9 +84,7 @@ public class DatabaseHelper {
         }
     }
 
-    /**
-     * Executes a SQL script file.
-     */
+    // FUNCTION: Executes the SQL script file
     public static boolean executeScript(String scriptPath) {
         try {
             String sql = Files.readString(Paths.get(scriptPath));
@@ -106,13 +105,11 @@ public class DatabaseHelper {
         }
     }
 
-    /**
-     * Initializes the database if it doesn't exist.
-     */
+    // FUNCTION: Initializes the database if it doesn't exist
     public static void initialize() {
         File dbFile = new File(DB_PATH);
         if (dbFile.exists() && dbFile.length() > 0) {
-            // Already initialized - verify
+            // FUNCTION: Verify
             List<Map<String, String>> test = query("SELECT COUNT(*) as c FROM movie");
             if (!test.isEmpty()) return;
         }
@@ -137,9 +134,7 @@ public class DatabaseHelper {
         }
     }
 
-    /**
-     * Escapes single quotes for SQL safety.
-     */
+    // FUNCTION: Escapes single quotes for SQL "safety"
     public static String escape(String value) {
         if (value == null) return "";
         return value.replace("'", "''");
