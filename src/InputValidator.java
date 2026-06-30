@@ -1,17 +1,19 @@
+/* ============================================
+ * MODULE 9: Input Validation Module
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: Validates all user inputs.
+            Ensures data integrity before operations.
+ * ============================================ */
+
 import java.util.Scanner;
 
-/**
- * MODULE 9: InputValidator
- * Validates all user input throughout the system.
- * Ensures data integrity before database operations.
- */
 public class InputValidator {
-
+    // FUNCTION: Scanner instance for user inputs
     private static final Scanner scanner = new Scanner(System.in);
 
-    /**
-     * Gets a non-empty string input from user.
-     */
+    // FUNCTION: Gets a non-empty string input from user
     public static String getString(String prompt) {
         while (true) {
             System.out.print("  " + prompt + ": ");
@@ -21,17 +23,13 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Gets an optional string (can be empty).
-     */
+    // FUNCTION: Gets an optional string (can be empty)
     public static String getOptionalString(String prompt) {
         System.out.print("  " + prompt + ": ");
         return scanner.nextLine().trim();
     }
 
-    /**
-     * Gets a valid integer input.
-     */
+    // FUNCTION: Gets a valid integer input
     public static int getInt(String prompt) {
         while (true) {
             System.out.print("  " + prompt + ": ");
@@ -44,9 +42,7 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Gets a valid integer within a range.
-     */
+    // FUNCTION: Gets a valid integer within a range.
     public static int getInt(String prompt, int min, int max) {
         while (true) {
             int value = getInt(prompt + " (" + min + "-" + max + ")");
@@ -55,9 +51,7 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Gets a valid double input.
-     */
+    // FUNCTION: Gets a valid double input
     public static double getDouble(String prompt) {
         while (true) {
             System.out.print("  " + prompt + ": ");
@@ -70,32 +64,24 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Gets a yes/no confirmation.
-     */
+    // FUNCTION: Gets a yes/no confirmation
     public static boolean confirm(String prompt) {
         System.out.print("  " + prompt + " (y/n): ");
         String input = scanner.nextLine().trim().toLowerCase();
         return input.equals("y") || input.equals("yes");
     }
 
-    /**
-     * Validates email format (basic check).
-     */
+    // FUNCTION: Validates email format
     public static boolean isValidEmail(String email) {
         return email != null && email.contains("@") && email.contains(".");
     }
 
-    /**
-     * Validates phone number (must be 11 digits starting with 09).
-     */
+    // FUNCTION: Validates phone number (must be 11 digits starting with 09)
     public static boolean isValidPhone(String phone) {
         return phone != null && phone.matches("09\\d{9}");
     }
 
-    /**
-     * Validates seat format (letter A-J followed by number 1-10).
-     */
+    // FUNCTION: Validates seat format (letter A-J followed by number 1-10)
     public static boolean isValidSeat(String seat) {
         if (seat == null || seat.length() < 2 || seat.length() > 3) return false;
         char row = seat.charAt(0);
@@ -108,9 +94,7 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Waits for user to press Enter.
-     */
+    // FUNCTION: Waits for user to press Enter
     public static void pause() {
         System.out.print("\n  Press Enter to continue...");
         scanner.nextLine();
