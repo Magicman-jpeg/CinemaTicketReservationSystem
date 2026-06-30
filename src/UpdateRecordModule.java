@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 6: Update Record Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: Allows users to update or edit existing records.
             Confirms if the record exists before updating.
