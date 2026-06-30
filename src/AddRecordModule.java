@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 3: Add Record Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: Allows admin to add new records to the database.
             Validate required fields before saving the record.
