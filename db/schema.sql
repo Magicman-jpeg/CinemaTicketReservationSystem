@@ -1,7 +1,7 @@
 -- ============================================
 -- Cinema Ticket Reservation System Database Schema (SQLite)
--- Original File: GROUP 2_cinema_hall_ticket_sales.xlsx
--- Author: Group 2 (BSIT 2-3)
+-- Original File: GROUP 1_cinema_hall_ticket_sales.xlsx
+-- Author: Group 1 (BSIT 2-3)
 -- Course: COMP 009 Object Oriented Programming
 -- ============================================
 
