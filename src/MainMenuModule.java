@@ -1,39 +1,35 @@
-/**
- * MODULE 2: MainMenuModule
- * Displays the main menu after successful login.
- * Routes user to different system features based on their role.
- *
+/* ============================================
+ * MODULE 2: Main Menu Module
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: 
  * ADMIN ACCESS: Full access to all features (View, Search, Add, Update, Delete, Reserve, Reports)
- *
  * CUSTOMER ACCESS (restricted):
  *   VIEW    - view movies, view screenings, view their OWN customer record, view their OWN transaction records
  *   SEARCH  - search movies, search screenings, search their OWN transaction records
  *   RESERVE - reserve a seat
  *   (Customers CANNOT access: Add, Update, Delete, Reports, or other customers' data)
- */
-public class MainMenuModule {
+ * ============================================ */
 
-    /**
-     * Displays and handles the main menu loop.
-     * Shows different menu options depending on whether user is Admin or Customer.
-     */
+public class MainMenuModule {
+    // FUNCTION: Displays and handles the main menu loop
+    //           Provides navigation to system modules based on role
     public static void show() {
         boolean running = true;
 
         while (running) {
             if (LoginModule.isAdmin()) {
-                // ADMIN MENU - Full access to all features
+                // FUNCTION: Redirect to ADMIN MENU - Full access to all features
                 running = showAdminMenu();
             } else {
-                // CUSTOMER MENU - Restricted access
+                // FUNCTION: Redirect to CUSTOMER MENU - Restricted access
                 running = showCustomerMenu();
             }
         }
     }
 
-    /**
-     * Admin menu - has access to ALL system features.
-     */
+    // FUNCTION: Show ALL system features for ADMIN access
     private static boolean showAdminMenu() {
         System.out.println("\n  ============================================");
         System.out.println("     ADMIN MENU - Logged in as: " + LoginModule.getName());
@@ -53,32 +49,26 @@ public class MainMenuModule {
 
         try {
             switch (choice) {
-                case 1 -> ViewRecordsModule.show();       // Admin sees ALL records
-                case 2 -> SearchRecordModule.show();      // Admin can search ALL
-                case 3 -> AddRecordModule.show();         // Admin only
-                case 4 -> UpdateRecordModule.show();      // Admin only
-                case 5 -> DeleteRecordModule.show();      // Admin only
-                case 6 -> reserveSeat();                  // Both can reserve
-                case 7 -> ReportModule.show();            // Admin only
+                case 1 -> ViewRecordsModule.show();       // FUNCTION: Admin can view ALL records
+                case 2 -> SearchRecordModule.show();      // FUNCTION: Admin can search ALL records
+                case 3 -> AddRecordModule.show();         // FUNCTION: Admin only adding records
+                case 4 -> UpdateRecordModule.show();      // FUNCTION: Admin only updating record
+                case 5 -> DeleteRecordModule.show();      // FUNCTION: Admin only deleting record
+                case 6 -> reserveSeat();                  // FUNCTION: Reserve seats
+                case 7 -> ReportModule.show();            // FUNCTION: Admin only report generation
                 case 8 -> {
                     LoginModule.logout();
-                    return false; // Exit menu loop
+                    return false;
                 }
             }
         } catch (Exception e) {
             ExceptionHandler.handle(e, "Admin Menu");
         }
-        return true; // Continue loop
+        return true;
     }
 
-    /**
-     * Customer menu - RESTRICTED access.
-     * Customers can ONLY:
-     *   - View movies, screenings, their OWN record, their OWN transactions
-     *   - Search movies, screenings, their OWN transactions
-     *   - Reserve a seat
-     * Customers CANNOT: Add, Update, Delete records, or Generate Reports.
-     */
+    // FUNCTION: Show RESTRICTED system features for CUSTOMER access
+    //           Customers CANNOT: Add, Update, Delete records, or Generate Reports.
     private static boolean showCustomerMenu() {
         System.out.println("\n  ============================================");
         System.out.println("     CUSTOMER MENU - Logged in as: " + LoginModule.getName());
@@ -99,45 +89,43 @@ public class MainMenuModule {
 
         try {
             switch (choice) {
-                // VIEW - only movies, screenings, OWN profile, OWN transactions
+                //  FUNCTION: VIEW - only movies, screenings, OWN profile, OWN transactions
                 case 1 -> ViewRecordsModule.displayMovies();
                 case 2 -> ViewRecordsModule.displayScreenings();
                 case 3 -> ViewRecordsModule.displayMyProfile();           // OWN record only
                 case 4 -> ViewRecordsModule.displayMyTransactions();      // OWN transactions only
 
-                // SEARCH - only movies, screenings, OWN transactions
+                // FUNCTION: SEARCH - only movies, screenings, OWN transactions
                 case 5 -> SearchRecordModule.searchMovie();
                 case 6 -> SearchRecordModule.searchScreening();
                 case 7 -> SearchRecordModule.searchMyTransactions();      // OWN transactions only
 
-                // RESERVE A SEAT
+                // FUNCTION: Reserve a seat
                 case 8 -> reserveSeat();
 
-                // LOGOUT
                 case 9 -> {
                     LoginModule.logout();
-                    return false; // Exit menu loop
+                    return false;
                 }
             }
         } catch (Exception e) {
             ExceptionHandler.handle(e, "Customer Menu");
         }
-        return true; // Continue loop
+        return true;
     }
 
-    /**
-     * Seat reservation flow.
-     * Available to BOTH Admin and Customer users.
-     */
+
+    // FUNCTION: Seat reservation flow
+    //           Displays screenings, seat map, and processes booking
     private static void reserveSeat() {
         System.out.println("\n  -------- RESERVE A SEAT --------");
 
-        // Show available screenings
+        // FUNCTION: Show available screenings
         ViewRecordsModule.displayScreenings();
 
         String screeningId = InputValidator.getString("Enter Screening ID (e.g. SUN-1)");
 
-        // Verify screening exists
+        // FUNCTION: Verify if screening exists in the database
         var screening = DatabaseHelper.query(String.format(
             "SELECT s.*, m.movie_title, st.seat_type, st.ticket_price FROM screenings s " +
             "LEFT JOIN movie m ON s.movie_id = m.movie_id " +
@@ -154,10 +142,10 @@ public class MainMenuModule {
         System.out.println("  Date:  " + scr.get("screening_date") + " at " + scr.get("time_slot"));
         System.out.println("  Type:  " + scr.get("seat_type") + " | Price: PHP " + scr.get("ticket_price"));
 
-        // Show seat map
+        // FUNCTION: Show seat map
         displaySeatMap(screeningId);
 
-        // Get seat selection
+        // FUNCTION: Get seat selection
         String seat;
         while (true) {
             seat = InputValidator.getString("Enter seat (e.g. A5)").toUpperCase();
@@ -165,7 +153,7 @@ public class MainMenuModule {
             ExceptionHandler.handleInvalidInput("Seat", "Must be A-J followed by 1-10");
         }
 
-        // Check if already booked
+        // FUNCTION: Checks if seat is already booked
         var booked = DatabaseHelper.query(String.format(
             "SELECT * FROM \"transaction\" WHERE screening_id='%s' AND seat_no='%s' AND status='CONFIRMED'",
             DatabaseHelper.escape(screeningId), DatabaseHelper.escape(seat)));
@@ -175,7 +163,7 @@ public class MainMenuModule {
             return;
         }
 
-        // Confirm and book
+        // FUNCTION: Confirms reservation and books seat
         double price = ExceptionHandler.safeParseDouble(scr.get("ticket_price"), 0);
         System.out.printf("\n  Total: PHP %.2f for seat %s%n", price, seat);
 
@@ -184,7 +172,7 @@ public class MainMenuModule {
             return;
         }
 
-        // Insert transaction
+        // FUNCTION: Inserts transaction into the database
         int custNo = LoginModule.getId();
         String txnId = scr.get("seat_type_id") + "-M" + String.format("%02d",
             ExceptionHandler.safeParseInt(scr.get("movie_id"), 0)) + "-" + custNo;
@@ -210,9 +198,8 @@ public class MainMenuModule {
         InputValidator.pause();
     }
 
-    /**
-     * Displays the ASCII seat map for a screening.
-     */
+    // FUNCTION: Displays the ASCII seat map for a screening
+    //           Marks reserved seats with XX and available seats with --
     private static void displaySeatMap(String screeningId) {
         var booked = DatabaseHelper.query(String.format(
             "SELECT seat_no FROM \"transaction\" WHERE screening_id='%s' AND status='CONFIRMED' AND seat_no IS NOT NULL",
