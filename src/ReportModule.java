@@ -1,11 +1,16 @@
-import java.util.*;
+/* ============================================
+ * MODULE 8: Report Generation Module
+ * Cinema Ticket Reservation System
+ * Author: Group 2 (BSIT 2-3)
+ * Course: COMP 009 Object Oriented Programming
+ * Purpose: Generates simple reports or summaries.
+ * ============================================ */
 
-/**
- * MODULE 8: ReportModule
- * Generates simple reports and summaries from the database.
- */
+import java.util.*; // Includes the Scanner class
+import java.util.Scanner;
+
 public class ReportModule {
-
+    // FUNCTION: Displays the Menu for Reports
     public static void show() {
         System.out.println("\n  -------- REPORTS --------");
         System.out.println("  [1] Sales Summary");
@@ -13,6 +18,7 @@ public class ReportModule {
         System.out.println("  [3] Popular Movies");
         System.out.println("  [4] Back");
 
+        // FUNCTION: Redirects the user to the method of their chosen action
         int choice = InputValidator.getInt("Choose", 1, 4);
         switch (choice) {
             case 1 -> salesSummary();
@@ -21,6 +27,8 @@ public class ReportModule {
         }
     }
 
+    // FUNCTION: Generates a sales summary report
+    //           Displays total revenue, transactions, movies, customers, and screenings
     private static void salesSummary() {
         System.out.println("\n  ============================================");
         System.out.println("       CINEMA SALES SUMMARY REPORT");
@@ -45,6 +53,8 @@ public class ReportModule {
         InputValidator.pause();
     }
 
+    // FUNCTION: Generates a daily revenue report
+    //           Groups transactions by date and shows revenue and ticket count
     private static void dailyRevenue() {
         System.out.println("\n  -------- DAILY REVENUE --------");
         var data = DatabaseHelper.query(
@@ -63,6 +73,8 @@ public class ReportModule {
         InputValidator.pause();
     }
 
+    // FUNCTION: Generates a report of popular movies by sales
+    //           Displays ranking, tickets sold, and revenue per movie
     private static void popularMovies() {
         System.out.println("\n  -------- POPULAR MOVIES (by sales) --------");
         var data = DatabaseHelper.query(
