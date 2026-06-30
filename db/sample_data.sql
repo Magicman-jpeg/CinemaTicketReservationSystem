@@ -1,12 +1,13 @@
--- Cinema Ticket Reservation System - Sample Data
--- Source: EDITED GROUP 2_cinema_hall_ticket_sales.xlsx
--- COMP 009 OOP Final Project - Group 1
+-- ============================================
+-- Cinema Ticket Reservation System Data
+-- Original File: GROUP 2_cinema_hall_ticket_sales.xlsx
+-- Author: Group 2 (BSIT 2-3)
+-- Course: COMP 009 Object Oriented Programming
+-- ============================================
 
 PRAGMA foreign_keys = ON;
 
--- ========== LOOKUP DATA ==========
-
--- Movie Genres
+-- ================= MOVIE GENRES =================
 INSERT OR IGNORE INTO movie_genre (genre_id, movie_genre) VALUES
 (1, 'Romance'),
 (2, 'Action'),
@@ -18,25 +19,27 @@ INSERT OR IGNORE INTO movie_genre (genre_id, movie_genre) VALUES
 (8, 'Drama'),
 (9, 'Sci-Fi');
 
--- Movie Status
+-- ================= MOVIE STATUS =================
 INSERT OR IGNORE INTO movie_status (status_id, movie_status) VALUES
 (1, 'Upcoming'),
 (2, 'Showing'),
 (3, 'Post-Screening');
 
--- Age Ratings
+-- ================= AGE RATINGS =================
 INSERT OR IGNORE INTO age_rating (age_rate_id, movie_age_rating) VALUES
 (1, 'PG'),
 (2, 'R13'),
 (3, 'R16');
 
--- Seat Types (with pricing)
+-- ================= SEAT TYPES =================
+-- Includes pricing and description
 INSERT OR IGNORE INTO seat_type (seat_type_id, seat_type, seat_description, ticket_price) VALUES
 (1, 'VIP', 'Reclining Seats, Butler Service, Complementary Snacks', 590.00),
 (2, 'Premium', 'Reclining Seats', 385.00),
 (3, 'Regular', 'No Benefits', 275.00);
 
--- ========== MOVIE DATA (15 movies) ==========
+-- ================= MOVIE DATA =================
+-- 15 movies with genre, duration, release date, status, and age rating
 INSERT OR IGNORE INTO movie (movie_id, movie_title, genre_id, movie_duration, duration_code, release_date, status_id, age_rate_id) VALUES
 (1, 'Fractured', 5, '1 hr 40 mins', 140, '2019-10-11', 2, 3),
 (2, 'Wicked Part 1', 6, '2 hrs 40 mins', 240, '2024-11-22', 2, 1),
@@ -54,7 +57,9 @@ INSERT OR IGNORE INTO movie (movie_id, movie_title, genre_id, movie_duration, du
 (14, 'Deranged', 3, '1 hr 49 mins', 149, '2012-07-05', 3, 2),
 (15, 'The Sheep Detectives', 8, '1 hr 49 mins', 149, '2026-05-08', 2, 1);
 
--- ========== ADMIN DATA (10 staff) ==========
+-- ================= ADMIN DATA =================
+-- 1 default admin account and
+-- 10 staff members with roles and login credentials
 INSERT OR IGNORE INTO admin (admin_id, role, admin_name, admin_username, admin_pass) VALUES
 (1001, 'Default Admin', 'RandHive', 'admin', 'admin123'),
 (2409, 'Manager', 'Patrice', 'fairytopia', 'popcornmanager'),
@@ -68,8 +73,8 @@ INSERT OR IGNORE INTO admin (admin_id, role, admin_name, admin_username, admin_p
 (1034, 'Box Office Staff', 'Teresa', 'disneyfan17', 'pixiedust*33'),
 (1035, 'Box Office Staff', 'Miguel', 'matrixneo101', 'redpillbluepill77');
 
-
--- ========== CINEMA SEAT DATA (100 seats: rows A-J, columns 1-10) ==========
+-- ================= CINEMA SEATS =================
+-- 100 seats: Rows A–J, Columns 1–10
 INSERT OR IGNORE INTO cinema_seat (seat_no, row, col) VALUES
 ('A1','A',1),('A2','A',2),('A3','A',3),('A4','A',4),('A5','A',5),
 ('A6','A',6),('A7','A',7),('A8','A',8),('A9','A',9),('A10','A',10),
@@ -92,7 +97,8 @@ INSERT OR IGNORE INTO cinema_seat (seat_no, row, col) VALUES
 ('J1','J',1),('J2','J',2),('J3','J',3),('J4','J',4),('J5','J',5),
 ('J6','J',6),('J7','J',7),('J8','J',8),('J9','J',9),('J10','J',10);
 
--- ========== SCREENINGS DATA (33 screenings across 3 days) ==========
+-- ================= SCREENINGS =================
+-- sample of 33 screenings across 3 days (SUN, MON, TUE)
 INSERT OR IGNORE INTO screenings (screening_id, screening_day, screening_date, time_slot, seat_type_id, movie_id, cinema_no) VALUES
 ('SUN-1', 'SUN', '2026-06-07', '12:30', 1, 3, 5),
 ('SUN-2', 'SUN', '2026-06-07', '15:30', 1, 3, 5),
@@ -129,7 +135,9 @@ INSERT OR IGNORE INTO screenings (screening_id, screening_day, screening_date, t
 ('TUE-12', 'TUE', '2026-06-09', '19:00', 3, 7, 2);
 
 
--- ========== CUSTOMER DATA (first 50 from 296 total in Excel) ==========
+-- ================= CUSTOMER DATA =================
+-- First 10 customers from the original Excel dataset
+-- If customer is not an app user, they will have NULL usernames & passwords
 INSERT OR IGNORE INTO customer (customer_no, name, age, email_address, app_user, customer_username, customer_pass, mobile_no) VALUES
 (1001, 'Ford Levisberg', 20, 'levisfordisberg@gmail.com', 'Yes', 'FordMustang', 'seat71HEEHEE', '09625872041'),
 (1002, 'Jayson Clyde Aravelo', 20, 'jaysonclyde92@gmail.com', 'Yes', 'Clydejayy2005', 'romancefan01_', '09178032820'),
@@ -142,7 +150,8 @@ INSERT OR IGNORE INTO customer (customer_no, name, age, email_address, app_user,
 (1009, 'Azriel Minguita', 64, 'azhudzon13@gmail.com', 'No', NULL, NULL, '09606538694'),
 (1010, 'Miguel Dimagiba', 70, 'miguelitosayskrim@gmail.com', 'No', NULL, NULL, '09562948371');
 
--- ========== TRANSACTION DATA (10 confirmed transactions from Excel) ==========
+-- ================= TRANSACTIONS =================
+-- 10 transactions with discounts, payment methods, and other ticket information referenced from various tables in the dataset
 INSERT OR IGNORE INTO "transaction" (transaction_id, transaction_date, transaction_time, customer_no, seat_no, screening_id, movie_id, seat_type_id, reservation_type, admin_id, booking_fee, ticket_price, discount_type, discount_amount, payment_method, total_payment, status) VALUES
 ('2-M05-1001', '2026-06-04', '09:12', 1001, 'C5', 'SUN-5', 5, 2, 'Online', NULL, 20.00, 385.00, 'N/A', 0.00, 'E-Wallet', 405.00, 'CONFIRMED'),
 ('3-M10-1002', '2026-06-04', '10:47', 1002, 'D3', 'MON-9', 10, 3, 'Online', NULL, 20.00, 275.00, 'PWD', 59.00, 'Online Bank', 236.00, 'CONFIRMED'),
