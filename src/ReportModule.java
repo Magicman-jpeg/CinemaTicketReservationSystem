@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 8: Report Generation Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: Generates simple reports or summaries.
  * ============================================ */
