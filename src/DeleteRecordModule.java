@@ -1,7 +1,7 @@
 /* ============================================
  * MODULE 7: Delete Record Module
  * Cinema Ticket Reservation System
- * Author: Group 2 (BSIT 2-3)
+ * Author: Group 1 (BSIT 2-3)
  * Course: COMP 009 Object Oriented Programming
  * Purpose: Allows authorized users to delete records from the database.
             Ask for confirmation before deleting a record.
